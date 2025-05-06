@@ -7,6 +7,7 @@ import Events from './Pages/Events';
 import AdvisorsMentors from './Pages/AdvisorsMentors';
 import Facilities from './Pages/Facilities';
 import ContactUs from './Pages/ContactUs';
+import Apply from './Pages/Apply';
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
             <Route path="/mentors" element={<AdvisorsMentors />} />
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/contact" element={<ContactUs />} />
+            <Route path="/apply" element={<Apply />} />
           </Routes>
         </main>
         <Footer />
