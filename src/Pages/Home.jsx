@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { FaLightbulb, FaQuoteLeft, FaRocket, FaUsers } from "react-icons/fa";
 import { FiArrowRight } from "react-icons/fi";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   // Programs data
@@ -65,7 +66,7 @@ const Home = () => {
 
   return (
     <div className="overflow-hidden">
-      Hero Section
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-orange-50 to-yellow-50 py-20">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
           <div className="md:w-1/2 flex justify-center order-1 md:order-2 mb-10 md:mb-0">
@@ -93,6 +94,15 @@ const Home = () => {
               <button className="px-8 py-3 border border-orange-500 text-orange-500 font-medium rounded-md hover:bg-orange-50 transition-colors">
                 Explore Programs
               </button>
+            </div>
+            {/* ✅ Notification Link added below buttons */}
+            <div className="mt-6">
+              <Link
+                to="/notifications"
+                className="inline-block bg-yellow-100 text-yellow-800 px-5 py-2 rounded-full text-base font-medium shadow-sm hover:bg-yellow-200 transition duration-300"
+              >
+                🔔 View Latest Notifications
+              </Link>
             </div>
           </div>
         </div>
@@ -282,12 +292,14 @@ const Home = () => {
           style={{ top: "40%", left: "40%" }}
           animate={{
             x: [0, 15, 0],
+            y: [0, -10, 0],
             opacity: [0.6, 0.9, 0.6],
           }}
           transition={{
             duration: 3.5,
             repeat: Infinity,
             ease: "easeInOut",
+            delay: 0.9,
           }}
         />
       </section>
