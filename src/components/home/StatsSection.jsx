@@ -5,7 +5,7 @@ const StatsSection = () => {
     { number: "25", label: "Incubated Startups" },
     { number: "₹3Cr", label: "Funding Through B3TF" },
     { number: "23", label: "Mentors Onboarded" },
-    { number: "04", label: "Women-Led Startups" },
+    { number: "4", label: "Women-Led Startups" },
   ];
 
   return (
@@ -29,7 +29,7 @@ const StatsSection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ delay: 0.2 }}
           >
-            MIITIE <span className="text-orange-500">in Numbers</span>
+            Our<span className="text-orange-500">Impacts</span>
           </motion.h2>
           <motion.div
             className="w-24 h-1 bg-orange-500 mx-auto mb-6"

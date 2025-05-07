@@ -1,13 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from "./Pages/Home"
-import IncubationPrograms from './Pages/IncubationPrograms';
-import Events from './Pages/Events';
-import AdvisorsMentors from './Pages/AdvisorsMentors';
-import Facilities from './Pages/Facilities';
-import ContactUs from './Pages/ContactUs';
-import Apply from './Pages/Apply';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+import Home from "./Pages/Home";
+import IncubationPrograms from "./Pages/IncubationPrograms";
+import Events from "./Pages/Events";
+import AdvisorsMentors from "./Pages/AdvisorsMentors";
+import Facilities from "./Pages/Facilities";
+import ContactUs from "./Pages/ContactUs";
+import Apply from "./Pages/Apply";
+import NotFound from "./Pages/NotFound";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/apply" element={<Apply />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         <Footer />

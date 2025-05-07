@@ -1,19 +1,30 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaLightbulb, FaFileAlt } from 'react-icons/fa';
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaMapMarkerAlt,
+  FaLightbulb,
+  FaFileAlt,
+} from "react-icons/fa";
 
 const Apply = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    mobile: '',
-    address: '',
-    projectTitle: '',
-    startupIdea: '',
-    teamMembers: '',
-    stage: 'idea',
-    fundingNeeded: '',
-    file: null
+    name: "",
+    email: "",
+    mobile: "",
+    address: "",
+    projectTitle: "",
+    startupIdea: "",
+    teamMembers: "",
+    stage: "idea",
+    fundingNeeded: "",
+    file: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,40 +32,40 @@ const Apply = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleFileChange = (e) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      file: e.target.files[0]
+      file: e.target.files[0],
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate form submission
     setTimeout(() => {
-      console.log('Form submitted:', formData);
+      console.log("Form submitted:", formData);
       setIsSubmitting(false);
       setSubmitSuccess(true);
       // Reset form after successful submission
       setFormData({
-        name: '',
-        email: '',
-        mobile: '',
-        address: '',
-        projectTitle: '',
-        startupIdea: '',
-        teamMembers: '',
-        stage: 'idea',
-        fundingNeeded: '',
-        file: null
+        name: "",
+        email: "",
+        mobile: "",
+        address: "",
+        projectTitle: "",
+        startupIdea: "",
+        teamMembers: "",
+        stage: "idea",
+        fundingNeeded: "",
+        file: null,
       });
     }, 1500);
   };
@@ -64,13 +75,26 @@ const Apply = () => {
       <div className="min-h-screen bg-gray-50 py-16">
         <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+            <svg
+              className="w-10 h-10 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              ></path>
             </svg>
           </div>
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">Application Submitted!</h2>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Application Submitted!
+          </h2>
           <p className="text-lg text-gray-600 mb-8">
-            Thank you for applying to the MIITIE Startup Incubation Centre. We've received your application and will review it shortly.
+            Thank you for applying to the MIITIE Startup Incubation Centre.
+            We've received your application and will review it shortly.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
@@ -99,7 +123,8 @@ const Apply = () => {
             Apply to <span className="text-orange-500">MIITIE Incubation</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Fill out this form to apply for our startup incubation programs. Our team will review your application and get back to you soon.
+            Fill out this form to apply for our startup incubation programs. Our
+            team will review your application and get back to you soon.
           </p>
         </div>
 
@@ -118,7 +143,10 @@ const Apply = () => {
                 </h3>
 
                 <div>
-                  <label htmlFor="name" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="name"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Full Name <span className="text-orange-500">*</span>
                   </label>
                   <div className="relative">
@@ -137,7 +165,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="email"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Email Address <span className="text-orange-500">*</span>
                   </label>
                   <div className="relative">
@@ -156,7 +187,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="mobile" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="mobile"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Mobile Number <span className="text-orange-500">*</span>
                   </label>
                   <div className="relative">
@@ -175,7 +209,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="address"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Address <span className="text-orange-500">*</span>
                   </label>
                   <div className="relative">
@@ -202,7 +239,10 @@ const Apply = () => {
                 </h3>
 
                 <div>
-                  <label htmlFor="projectTitle" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="projectTitle"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Project Title <span className="text-orange-500">*</span>
                   </label>
                   <input
@@ -218,7 +258,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="startupIdea" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="startupIdea"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Brief Idea <span className="text-orange-500">*</span>
                   </label>
                   <textarea
@@ -234,7 +277,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="teamMembers" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="teamMembers"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Team Members
                   </label>
                   <input
@@ -259,7 +305,10 @@ const Apply = () => {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="stage" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="stage"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Current Stage <span className="text-orange-500">*</span>
                   </label>
                   <select
@@ -278,7 +327,10 @@ const Apply = () => {
                 </div>
 
                 <div>
-                  <label htmlFor="fundingNeeded" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="fundingNeeded"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Funding Needed (₹)
                   </label>
                   <input
@@ -293,23 +345,38 @@ const Apply = () => {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label htmlFor="file" className="block text-gray-700 mb-2 font-medium">
+                  <label
+                    htmlFor="file"
+                    className="block text-gray-700 mb-2 font-medium"
+                  >
                     Business Plan / Pitch Deck (PDF)
                   </label>
                   <div className="flex items-center">
                     <label className="flex flex-col items-center px-4 py-6 bg-white rounded-lg border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
-                      <svg className="w-8 h-8 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                      <svg
+                        className="w-8 h-8 text-gray-400 mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        ></path>
                       </svg>
                       <span className="text-sm text-gray-600">
-                        {formData.file ? formData.file.name : 'Click to upload file'}
+                        {formData.file
+                          ? formData.file.name
+                          : "Click to upload file"}
                       </span>
-                      <input 
-                        type="file" 
-                        id="file" 
+                      <input
+                        type="file"
+                        id="file"
                         name="file"
                         onChange={handleFileChange}
-                        className="hidden" 
+                        className="hidden"
                         accept=".pdf,.doc,.docx"
                       />
                     </label>
@@ -320,24 +387,46 @@ const Apply = () => {
 
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-6">
               <p className="text-gray-600 text-sm">
-                By submitting this form, you agree to our <Link to="/terms" className="text-orange-500 hover:underline">Terms and Conditions</Link>.
+                By submitting this form, you agree to our{" "}
+                <Link to="/terms" className="text-orange-500 hover:underline">
+                  Terms and Conditions
+                </Link>
+                .
               </p>
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className={`px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                  isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                 }`}
               >
                 {isSubmitting ? (
                   <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Submitting...
                   </span>
-                ) : 'Submit Application'}
+                ) : (
+                  "Submit Application"
+                )}
               </button>
             </div>
           </form>

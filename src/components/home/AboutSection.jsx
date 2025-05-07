@@ -60,7 +60,7 @@ const AboutSection = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ delay: 0.3 }}
         >
-          <h3 className="text-xl font-bold text-center mb-8 text-gray-800">
+          <h3 className="text-xl font-bold text-center text-gray-800">
             Our Key Activities
           </h3>
           <div className="grid md:grid-cols-3 gap-6">
@@ -102,7 +102,7 @@ const AboutSection = () => {
           </div>
         </motion.div>
 
-        <ProgramCards />
+        {/* <ProgramCards /> */}
       </div>
     </section>
   );

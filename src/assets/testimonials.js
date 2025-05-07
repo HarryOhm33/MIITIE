@@ -1,6 +1,9 @@
+import abhinavJha from "./success-img/abhinav-jha.jpg"; // Adjust the path as necessary
+import atulAnand from "./success-img/atul-anand.jpg"; // Adjust the path as necessary
+
 const testimonials = [
   {
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
+    image: abhinavJha,
     quote:
       "I extend my heartfelt gratitude to MIITTIE, Darbhanga College of Engineering, for their invaluable support in the growth journey of my startup, TirhutWala.com.",
     author: "Abhinav Jha",
@@ -12,18 +15,22 @@ const testimonials = [
       With their backing, we are now better equipped to take the authentic taste of Bihar to plates across India. Thank you for believing in our dream and fueling the spirit of local entrepreneurship."`,
   },
   {
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
+    image: atulAnand,
     quote:
-      "The mentorship and infrastructure support helped us secure our first round of funding.",
-    author: "Priya Sharma",
-    company: "Co-Founder, AgriInnovate",
-    extendedQuote: `Coming from an agricultural background but with limited technical knowledge, MIITIE provided the perfect bridge between traditional farming and modern agri-tech solutions. 
-
-The incubation center connected us with agricultural experts who helped validate our soil monitoring system concept. The 3D printing lab allowed us to create affordable prototypes that we could test with local farmers.
-
-The investor pitch workshops were transformative - they helped us craft a compelling narrative about our solution's impact. This preparation led directly to us winning the state agri-tech challenge and securing our initial funding.
-
-Now in our third year of operation, we've deployed sensors across 500 acres of farmland, helping farmers increase yields by an average of 22% while reducing water usage by 30%. The ongoing mentorship from MIITIE's network continues to help us scale responsibly.`,
+      "MIITTIE has not just helped us grow—they’ve helped us dream bigger and act bolder. For that, I remain sincerely thankful.",
+    author: "Atul Anand",
+    company: "Founder – Sarva Suvidhane Pvt Ltd (S2)",
+    extendedQuote: `As the founder of Sarva Suvidhane Pvt Ltd (S2), I wholeheartedly extend my deepest gratitude to MIITTIE at Darbhanga College of Engineering. Their unwavering support has been one of the most significant pillars in our entrepreneurial journey. 
+  
+  What started as a vision to solve local problems and bring regional flavors to a wider audience has now transformed into a growing enterprise—thanks in large part to their mentorship and resources.
+  
+  MIITTIE provided us with not just technical guidance, but also strategic insights, networking opportunities, and access to an ecosystem that truly nurtures innovation. Their belief in our potential gave us the confidence to push boundaries and expand our solutions across five zones of Indian Railways—ECR, ER, NFR, NR, and NCR.
+  
+  Today, our services have reached over 500 trains and 90 railway stations, a milestone that reflects the strength of our partnership and shared vision. Their ecosystem fostered a sense of belief and direction that helped us stay focused on our mission.
+  
+  With their continued backing, we are proudly working towards taking the authentic taste of Bihar to dinner tables across the country—creating not just business growth, but also opportunities for local farmers, food artisans, and supply chain workers.
+  
+  MIITTIE has not just helped us grow—they’ve helped us dream bigger and act bolder. For that, I remain sincerely thankful. It’s collaborations like these that truly ignite the spirit of local entrepreneurship and turn ideas into impactful realities.`,
   },
   {
     image: "https://randomuser.me/api/portraits/men/52.jpg",

@@ -1,9 +1,13 @@
 import { FaLinkedin, FaBriefcase, FaUserTie } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { advisors } from "../assets/mentor"; // Adjust the path as necessary
 
 const AdvisorsMentors = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -61,7 +65,7 @@ const AdvisorsMentors = () => {
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="p-6 text-center">
-                  <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-orange-50 flex items-center justify-center overflow-hidden border-4 border-white shadow-md">
+                  <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-orange-50 flex items-center justify-center overflow-hidden border-4 border-orange-300 shadow-md">
                     {imgError ? (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100">
                         <FaUserTie className="text-5xl text-orange-300" />

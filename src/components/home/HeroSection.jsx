@@ -52,8 +52,10 @@ const HeroSection = () => {
               ease: "easeOut",
             }}
           >
-            MIITIE Startup Incubation Centre provides the perfect launchpad for
-            student entrepreneurs to transform ideas into successful ventures.
+            MIITIE (Mithila Institute of Inclusive Technological Innovation &
+            Entrepreneurship) Incubation Centre provides the perfect launchpad
+            for student entrepreneurs to transform ideas into successful
+            ventures.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
@@ -61,20 +63,27 @@ const HeroSection = () => {
             animate={{ opacity: 1 }}
             transition={{ staggerChildren: 0.1 }}
           >
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors"
-            >
-              Apply for Incubation
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              className="px-8 py-3 border border-orange-500 text-orange-500 font-medium rounded-md hover:bg-orange-50 transition-colors"
-            >
-              Explore Programs
-            </motion.button>
+            <motion.div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+              <Link to="/apply">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors cursor-pointer text-center"
+                >
+                  Apply for Incubation
+                </motion.div>
+              </Link>
+
+              <Link to="/programs">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-8 py-3 border border-orange-500 text-orange-500 font-medium rounded-md hover:bg-orange-50 transition-colors cursor-pointer text-center"
+                >
+                  Explore Programs
+                </motion.div>
+              </Link>
+            </motion.div>
           </motion.div>
           <motion.div
             className="mt-6"
