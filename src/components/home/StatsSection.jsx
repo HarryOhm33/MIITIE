@@ -29,7 +29,7 @@ const StatsSection = () => {
             viewport={{ once: true, margin: "-100px" }}
             transition={{ delay: 0.2 }}
           >
-            Our<span className="text-orange-500">Impacts</span>
+            Our <span className="text-orange-500">Impacts</span>
           </motion.h2>
           <motion.div
             className="w-24 h-1 bg-orange-500 mx-auto mb-6"
