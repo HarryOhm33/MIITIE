@@ -138,14 +138,17 @@ const Facilities = () => {
           <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
             Take a Virtual Tour
           </h3>
-          <div className="aspect-w-16 aspect-h-9 bg-orange-100 flex items-center justify-center rounded-lg overflow-hidden">
+          <div className="aspect-w-16 aspect-h-9 bg-orange-100 flex items-center justify-center rounded-lg overflow-hidden py-6">
             <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/6lt2JfJdGSY"
-              title="Virtual Tour"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+              width="560"
+              height="315"
+              className="rounded-lg"
+              src="https://www.youtube.com/embed/clOImDZiS9g?si=Dw9Z9uM-7_8sbxCu"
+              title="YouTube video player"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allowfullscreen
             ></iframe>
           </div>
         </motion.div>

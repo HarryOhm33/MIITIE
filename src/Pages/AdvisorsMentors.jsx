@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaBriefcase, FaLinkedin, FaUserTie } from "react-icons/fa";
 import { advisors } from "../assets/mentor"; // Adjust the path as necessary
+import { Link } from "react-router-dom";
 
 const AdvisorsMentors = () => {
   useEffect(() => {
@@ -127,9 +128,12 @@ const AdvisorsMentors = () => {
           transition={{ delay: 0.5 }}
           className="text-center mt-16"
         >
-          <button className="px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg">
+          <Link
+            to="/mentor-form"
+            className="inline-block px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors shadow-md hover:shadow-lg"
+          >
             Become a Mentor
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>

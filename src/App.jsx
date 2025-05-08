@@ -11,6 +11,8 @@ import Facilities from "./Pages/Facilities";
 import ContactUs from "./Pages/ContactUs";
 import Apply from "./Pages/Apply";
 import NotFound from "./Pages/NotFound";
+import Terms from "./Pages/terms";
+import MentorForm from "./Pages/MentorForm";
 
 function App() {
   return (
@@ -23,11 +25,13 @@ function App() {
             <Route path="/programs" element={<IncubationPrograms />} />
             <Route path="/events" element={<Events />} />
             <Route path="/mentors" element={<AdvisorsMentors />} />
-            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/mentor-form" element={<MentorForm />} />
+            <Route path="/facilities" element={<Facilities />} />-
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/apply" element={<Apply />} />
-            <Route path="/about" element={<About/>} />
-            <Route path="/notifications" element={<Notifications/>} />
+            <Route path="/about" element={<About />} />
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

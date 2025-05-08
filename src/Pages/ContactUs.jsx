@@ -1,13 +1,22 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   FaClock,
   FaEnvelope,
   FaMapMarkerAlt,
   FaPhoneAlt,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const ContactUs = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -29,6 +38,54 @@ const ContactUs = () => {
       opacity: 1,
       transition: { duration: 0.5 },
     },
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+          form_type: "MIITIE Contact Form", // Add this unique identifier
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Form submitted! We will get back to you shortly.");
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      } else {
+        throw new Error(result.message || "Submission failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Submission failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -73,9 +130,9 @@ const ContactUs = () => {
                   title: "Address",
                   content: (
                     <>
-                      Miitie Startup Incubation Centre
+                      Heritage Building,
                       <br />
-                      Darbhanga College of Engineering
+                      Darbhanga College of Engineering,
                       <br />
                       Darbhanga, Bihar - 846004
                     </>
@@ -84,12 +141,35 @@ const ContactUs = () => {
                 {
                   icon: <FaPhoneAlt className="text-orange-500" />,
                   title: "Phone",
-                  content: "+91 1234567890",
+                  content: (
+                    <>
+                      <a
+                        href="tel:+917250840578"
+                        className="hover:text-orange-500 transition-colors"
+                      >
+                        +91-7250840578
+                      </a>
+                      <br />
+                      <a
+                        href="tel:+917004906223"
+                        className="hover:text-orange-500 transition-colors"
+                      >
+                        +91-7004906223
+                      </a>
+                    </>
+                  ),
                 },
                 {
                   icon: <FaEnvelope className="text-orange-500" />,
                   title: "Email",
-                  content: "incubation@dce.ac.in",
+                  content: (
+                    <a
+                      href="mailto:miitiedarbhanga0407@gmail.com"
+                      className="hover:text-orange-500 transition-colors"
+                    >
+                      miitiedarbhanga0407@gmail.com
+                    </a>
+                  ),
                 },
                 {
                   icon: <FaClock className="text-orange-500" />,
@@ -119,7 +199,7 @@ const ContactUs = () => {
             <h3 className="text-2xl font-semibold mb-6 text-gray-800">
               Send Us a Message
             </h3>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <motion.div
                 variants={itemVariants}
                 className="grid grid-cols-2 gap-4"
@@ -131,8 +211,12 @@ const ContactUs = () => {
                   <input
                     type="text"
                     id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Your Name"
+                    required
                   />
                 </div>
                 <div>
@@ -142,8 +226,12 @@ const ContactUs = () => {
                   <input
                     type="email"
                     id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Your Email"
+                    required
                   />
                 </div>
               </motion.div>
@@ -155,8 +243,12 @@ const ContactUs = () => {
                 <input
                   type="text"
                   id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="Subject"
+                  required
                 />
               </motion.div>
 
@@ -166,18 +258,23 @@ const ContactUs = () => {
                 </label>
                 <textarea
                   id="message"
+                  name="message"
                   rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="Your Message"
+                  required
                 ></textarea>
               </motion.div>
 
               <motion.button
                 type="submit"
                 variants={itemVariants}
-                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors"
+                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50"
+                disabled={isSubmitting}
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
               </motion.button>
             </form>
           </motion.div>
@@ -189,13 +286,23 @@ const ContactUs = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="mt-16 bg-orange-50 p-8 rounded-lg"
+          className="mt-16 bg-orange-50 p-4 sm:p-8 rounded-lg"
         >
           <h3 className="text-2xl font-bold mb-6 text-center text-gray-800">
             Location Map
           </h3>
-          <div className="aspect-w-16 aspect-h-9 bg-orange-100 flex items-center justify-center rounded-lg">
-            <span className="text-2xl text-orange-300">Google Maps Embed</span>
+          <div className="relative overflow-hidden pb-[56.25%] rounded-lg">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d547.8457293722956!2d85.86481847194746!3d26.17928765360071!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39edb75b85cc6827%3A0x6323aca3b97a9fe1!2sDarbhanga%20College%20of%20Engineering%2C%20Darbhanga!5e0!3m2!1sen!2sin!4v1746726113619!5m2!1sen!2sin"
+              className="absolute top-0 left-0 w-full h-full border-0"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="MIITIE Location Map"
+              style={{
+                pointerEvents: "auto", // Crucial for mobile interactions
+              }}
+            />
           </div>
         </motion.div>
       </div>

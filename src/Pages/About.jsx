@@ -7,15 +7,14 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { useInView } from "react-intersection-observer";
+import ankitKumar from "../assets/faculty-img/ankit-kumar.jpg";
 
 const About = () => {
- 
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
   });
 
-  
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -42,14 +41,22 @@ const About = () => {
   const facultyMembers = [
     {
       id: 1,
+      name: "Prof. (Dr.) Sandeep Tiwari",
+      designation: "Principal, DCE Darbhanga",
+      mobile: "", // Add if available
+      email: "", // Add if available
+      image: "/faculty/sandeep.jpg", // Update path if different
+    },
+    {
+      id: 2,
       name: "Mr. Ankit Kumar",
       designation: "Faculty Incharge, Startup Cell",
       mobile: "+91-7250840578",
       email: "ankitkr606@gmail.com",
-      image: "/faculty/ankit.jpg",
+      image: ankitKumar,
     },
     {
-      id: 2,
+      id: 3,
       name: "Mr. Surya Prakash",
       designation: "Startup Cell Coordinator",
       mobile: "7004906223",
@@ -163,7 +170,7 @@ const About = () => {
             >
               <div className="bg-orange-100 rounded-xl overflow-hidden aspect-square max-w-md mx-auto">
                 <img
-                  src="/about-image.jpg"
+                  src="https://www.dce-darbhanga.org/wp-content/uploads/2024/08/mo.jpg"
                   alt="MIITIE Incubation Center"
                   className="w-full h-full object-cover"
                 />

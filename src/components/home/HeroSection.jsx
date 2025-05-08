@@ -16,8 +16,13 @@ const HeroSection = () => {
             delay: 0.2,
           }}
         >
-          <div className="bg-orange-100 rounded-lg w-full max-w-md h-64 md:h-80 flex items-center justify-center">
-            <span className="text-2xl text-orange-300">Hero Illustration</span>
+          <div className="bg-orange-100 rounded-lg w-full max-w-md h-64 md:h-80 flex items-center justify-center overflow-hidden">
+            <img
+              src="https://www.dce-darbhanga.org/wp-content/uploads/2024/08/mo.jpg"
+              alt="Hero Illustration"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
         </motion.div>
 

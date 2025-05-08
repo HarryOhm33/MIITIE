@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -6,8 +7,8 @@ import {
   FaPhone,
   FaMapMarkerAlt,
   FaLightbulb,
-  FaFileAlt,
 } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Apply = () => {
   useEffect(() => {
@@ -24,11 +25,29 @@ const Apply = () => {
     teamMembers: "",
     stage: "idea",
     fundingNeeded: "",
-    file: null,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.5 },
+    },
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,43 +57,83 @@ const Apply = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      file: e.target.files[0],
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate form submission
-    setTimeout(() => {
-      console.log("Form submitted:", formData);
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
-      // Reset form after successful submission
-      setFormData({
-        name: "",
-        email: "",
-        mobile: "",
-        address: "",
-        projectTitle: "",
-        startupIdea: "",
-        teamMembers: "",
-        stage: "idea",
-        fundingNeeded: "",
-        file: null,
+    // Truncate long fields to prevent "request too long" error
+    const truncatedData = {
+      ...formData,
+      startupIdea: formData.startupIdea.substring(0, 1000), // Limit to 1000 chars
+      address: formData.address.substring(0, 500), // Limit to 500 chars
+    };
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
+          form_type: "MIITIE Application Form",
+          ...truncatedData,
+        }),
       });
-    }, 1500);
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Application submitted successfully!");
+        setSubmitSuccess(true);
+        // Reset form after successful submission
+        setFormData({
+          name: "",
+          email: "",
+          mobile: "",
+          address: "",
+          projectTitle: "",
+          startupIdea: "",
+          teamMembers: "",
+          stage: "idea",
+          fundingNeeded: "",
+        });
+      } else {
+        throw new Error(result.message || "Submission failed");
+      }
+    } catch (error) {
+      toast.error(
+        error.message ||
+          "Submission failed. Please try again with shorter responses."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (submitSuccess) {
+    {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
     return (
-      <div className="min-h-screen bg-gray-50 py-16">
-        <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="min-h-screen bg-gradient-to-r from-orange-50 to-yellow-50 py-16"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
             <svg
               className="w-10 h-10 text-green-500"
               fill="none"
@@ -88,7 +147,7 @@ const Apply = () => {
                 d="M5 13l4 4L19 7"
               ></path>
             </svg>
-          </div>
+          </motion.div>
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             Application Submitted!
           </h2>
@@ -110,33 +169,67 @@ const Apply = () => {
               Explore Programs
             </Link>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gradient-to-r from-orange-50 to-yellow-50 py-12">
       <div className="max-w-4xl mx-auto px-4">
-        <div className="text-center mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
             Apply to <span className="text-orange-500">MIITIE Incubation</span>
           </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <motion.div
+            className="w-24 h-1 bg-orange-500 mx-auto mt-3"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          />
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
             Fill out this form to apply for our startup incubation programs. Our
             team will review your application and get back to you soon.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="bg-white rounded-lg shadow-md overflow-hidden"
+        >
           <div className="p-6 bg-gradient-to-r from-orange-500 to-yellow-400">
-            <h2 className="text-2xl font-bold text-white">Application Form</h2>
+            <motion.h2
+              initial={{ x: -20, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="text-2xl font-bold text-white"
+            >
+              Application Form
+            </motion.h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 md:p-8">
+          <motion.form
+            onSubmit={handleSubmit}
+            className="p-6 md:p-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.1 }}
+          >
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               {/* Personal Information */}
-              <div className="space-y-6">
+              <motion.div variants={itemVariants} className="space-y-6">
                 <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center">
                   <FaUser className="mr-2 text-orange-500" />
                   Personal Information
@@ -225,14 +318,18 @@ const Apply = () => {
                       rows="3"
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pl-10"
                       placeholder="Your complete address"
+                      maxLength="500"
                     ></textarea>
                     <FaMapMarkerAlt className="absolute left-3 top-3 text-gray-400" />
+                    <span className="text-xs text-gray-500 block text-right mt-1">
+                      {formData.address.length}/500 characters
+                    </span>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Startup Information */}
-              <div className="space-y-6">
+              <motion.div variants={itemVariants} className="space-y-6">
                 <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4 flex items-center">
                   <FaLightbulb className="mr-2 text-orange-500" />
                   Startup Details
@@ -254,6 +351,7 @@ const Apply = () => {
                     required
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Your innovative project name"
+                    maxLength="100"
                   />
                 </div>
 
@@ -273,7 +371,11 @@ const Apply = () => {
                     rows="5"
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Describe your startup idea in 200-300 words"
+                    maxLength="1000"
                   ></textarea>
+                  <span className="text-xs text-gray-500 block text-right mt-1">
+                    {formData.startupIdea.length}/1000 characters
+                  </span>
                 </div>
 
                 <div>
@@ -291,15 +393,15 @@ const Apply = () => {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Names and roles of team members"
+                    maxLength="200"
                   />
                 </div>
-              </div>
+              </motion.div>
             </div>
 
             {/* Additional Information */}
-            <div className="mb-8">
-              <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-6 flex items-center">
-                <FaFileAlt className="mr-2 text-orange-500" />
+            <motion.div variants={itemVariants} className="mb-8">
+              <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-6">
                 Additional Information
               </h3>
 
@@ -341,51 +443,16 @@ const Apply = () => {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Estimated funding requirement"
+                    maxLength="50"
                   />
                 </div>
-
-                <div className="md:col-span-2">
-                  <label
-                    htmlFor="file"
-                    className="block text-gray-700 mb-2 font-medium"
-                  >
-                    Business Plan / Pitch Deck (PDF)
-                  </label>
-                  <div className="flex items-center">
-                    <label className="flex flex-col items-center px-4 py-6 bg-white rounded-lg border border-dashed border-gray-300 cursor-pointer hover:bg-gray-50">
-                      <svg
-                        className="w-8 h-8 text-gray-400 mb-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                        ></path>
-                      </svg>
-                      <span className="text-sm text-gray-600">
-                        {formData.file
-                          ? formData.file.name
-                          : "Click to upload file"}
-                      </span>
-                      <input
-                        type="file"
-                        id="file"
-                        name="file"
-                        onChange={handleFileChange}
-                        className="hidden"
-                        accept=".pdf,.doc,.docx"
-                      />
-                    </label>
-                  </div>
-                </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-6">
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-6"
+            >
               <p className="text-gray-600 text-sm">
                 By submitting this form, you agree to our{" "}
                 <Link to="/terms" className="text-orange-500 hover:underline">
@@ -393,12 +460,14 @@ const Apply = () => {
                 </Link>
                 .
               </p>
-              <button
+              <motion.button
                 type="submit"
                 disabled={isSubmitting}
                 className={`px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
                   isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                 }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
                 {isSubmitting ? (
                   <span className="flex items-center">
@@ -427,10 +496,10 @@ const Apply = () => {
                 ) : (
                   "Submit Application"
                 )}
-              </button>
-            </div>
-          </form>
-        </div>
+              </motion.button>
+            </motion.div>
+          </motion.form>
+        </motion.div>
       </div>
     </div>
   );
