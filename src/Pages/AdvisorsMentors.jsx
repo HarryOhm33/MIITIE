@@ -30,7 +30,7 @@ const AdvisorsMentors = () => {
   };
 
   return (
-    <section className="py-16 bg-white">
+    <section className="relative bg-gradient-to-r from-orange-50 to-yellow-50 py-28 mt-[-4rem]">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
