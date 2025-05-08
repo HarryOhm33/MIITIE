@@ -56,29 +56,40 @@ const CallToAction = () => {
       />
 
       {/* Floating particles */}
-      {[...Array(6)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute rounded-full bg-orange-400 opacity-20"
-          style={{
-            width: `${Math.random() * 10 + 5}px`,
-            height: `${Math.random() * 10 + 5}px`,
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-          }}
-          animate={{
-            y: [0, (Math.random() - 0.5) * 40, 0],
-            x: [0, (Math.random() - 0.5) * 30, 0],
-            opacity: [0.2, 0.4, 0.2],
-          }}
-          transition={{
-            duration: Math.random() * 10 + 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: Math.random() * 5,
-          }}
-        />
-      ))}
+      {[...Array(12)].map((_, i) => {
+        const size = Math.random() * 12 + 6; // 6px to 18px
+        const colors = ["bg-orange-600", "bg-yellow-500", "bg-orange-700"];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const xOffset = (Math.random() - 0.5) * 50; // More movement
+        const yOffset = (Math.random() - 0.5) * 50;
+        const scale = Math.random() * 0.3 + 0.85;
+
+        return (
+          <motion.div
+            key={i}
+            className={`absolute rounded-full ${color} opacity-40 pointer-events-none`}
+            style={{
+              width: `${size}px`,
+              height: `${size}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              zIndex: 1,
+            }}
+            animate={{
+              x: [0, xOffset, 0],
+              y: [0, yOffset, 0],
+              scale: [1, scale, 1],
+              opacity: [0.4, 0.7, 0.4],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: Math.random() * 5,
+            }}
+          />
+        );
+      })}
 
       {/* Content (unchanged) */}
       <div className="container mx-auto px-4 text-center relative z-10">

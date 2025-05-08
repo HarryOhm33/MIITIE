@@ -1,12 +1,5 @@
 import { motion } from "framer-motion";
-import {
-  FaTwitter,
-  FaInstagram,
-  FaChalkboardTeacher,
-  FaUsersCog,
-  FaLightbulb,
-} from "react-icons/fa";
-import ProgramCards from "./ProgramCards";
+import { FaChalkboardTeacher, FaLightbulb, FaUsersCog } from "react-icons/fa";
 
 const AboutSection = () => {
   return (
@@ -60,7 +53,7 @@ const AboutSection = () => {
           viewport={{ once: true, margin: "-100px" }}
           transition={{ delay: 0.3 }}
         >
-          <h3 className="text-xl font-bold text-center text-gray-800">
+          <h3 className="text-xl font-bold text-center text-gray-800 mb-6">
             Our Key Activities
           </h3>
           <div className="grid md:grid-cols-3 gap-6">

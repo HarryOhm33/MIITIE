@@ -1,6 +1,6 @@
-import { FaLinkedin, FaBriefcase, FaUserTie } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { FaBriefcase, FaLinkedin, FaUserTie } from "react-icons/fa";
 import { advisors } from "../assets/mentor"; // Adjust the path as necessary
 
 const AdvisorsMentors = () => {
@@ -38,9 +38,27 @@ const AdvisorsMentors = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+          {/* <h2 className="text-4xl font-bold text-gray-800 mb-4">
             Our <span className="text-orange-500">Advisors & Mentors</span>
-          </h2>
+          </h2> */}
+          <motion.h2
+            className="text-4xl font-bold text-gray-800 mb-3"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ delay: 0.2 }}
+          >
+            Our <span className="text-orange-500">Advisors & Mentors</span>
+          </motion.h2>
+
+          <motion.div
+            className="w-34 h-1 bg-orange-500 mx-auto mb-3"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+          />
+
           <p className="text-gray-600 max-w-2xl mx-auto">
             Experienced professionals guiding our vision with their expertise
             and leadership.
