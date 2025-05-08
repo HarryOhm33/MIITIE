@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { FaCalendarAlt, FaMapMarkerAlt, FaRegClock } from "react-icons/fa";
 
 const Events = () => {
@@ -20,22 +21,70 @@ const Events = () => {
     },
   ];
 
-  return (
-    <section className="relative bg-gradient-to-r from-orange-50 to-yellow-50 py-28 mt-[-4.2rem]">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">
-          Upcoming <span className="text-orange-500">Events</span>
-        </h2>
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
 
-        <div className="grid md:grid-cols-2 gap-8">
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 },
+    },
+  };
+
+  return (
+    <section className="relative bg-gradient-to-r from-orange-50 to-yellow-50 py-28 mt-[-4.4rem]">
+      <div className="container mx-auto px-4">
+        {/* Animated Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12"
+        >
+          <h2 className="text-3xl font-bold text-gray-800">
+            Upcoming <span className="text-orange-500">Events</span>
+          </h2>
+          <motion.div
+            className="w-24 h-1 bg-orange-500 mx-auto mt-3"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            style={{ transformOrigin: "center" }}
+          />
+        </motion.div>
+
+        {/* Event Cards */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 gap-8"
+        >
           {upcomingEvents.map((event, index) => (
-            <div
+            <motion.div
               key={index}
-              className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              variants={cardVariants}
+              whileHover={{ scale: 1 }}
+              className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
             >
-              <div className="h-48 bg-orange-100 flex items-center justify-center">
-                <span className="text-5xl text-orange-300">Event Image</span>
-                {/* Replace with actual image: <img src={event.image} alt={event.title} className="w-full h-full object-cover" /> */}
+              <div className="h-56 w-full overflow-hidden">
+                <img
+                  src={event.image}
+                  alt={event.title}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 text-gray-800">
@@ -43,7 +92,7 @@ const Events = () => {
                 </h3>
                 <p className="text-gray-600 mb-4">{event.description}</p>
 
-                <div className="flex flex-wrap gap-4 mt-4">
+                <div className="flex flex-wrap gap-4 mt-4 text-sm">
                   <div className="flex items-center text-gray-600">
                     <FaCalendarAlt className="mr-2 text-orange-500" />
                     <span>{event.date}</span>
@@ -62,15 +111,22 @@ const Events = () => {
                   Register Now
                 </button>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="text-center mt-12">
+        {/* View Past Events */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mt-12"
+        >
           <button className="px-8 py-3 bg-yellow-400 text-gray-800 font-medium rounded-md hover:bg-yellow-500 transition-colors">
             View Past Events
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
