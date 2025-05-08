@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import About from "./Pages/About";
 import Home from "./Pages/Home";
 import IncubationPrograms from "./Pages/IncubationPrograms";
 import Events from "./Pages/Events";
@@ -24,6 +25,7 @@ function App() {
             <Route path="/facilities" element={<Facilities />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/apply" element={<Apply />} />
+            <Route path="/about" element={<About/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
