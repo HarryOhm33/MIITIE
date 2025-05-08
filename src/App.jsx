@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import About from "./Pages/About";
+import Notifications from "./Pages/Notifications";
 import Home from "./Pages/Home";
 import IncubationPrograms from "./Pages/IncubationPrograms";
 import Events from "./Pages/Events";
@@ -26,6 +27,7 @@ function App() {
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/about" element={<About/>} />
+            <Route path="/notifications" element={<Notifications/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
