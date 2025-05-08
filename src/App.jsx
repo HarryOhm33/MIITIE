@@ -11,7 +11,7 @@ import Facilities from "./Pages/Facilities";
 import ContactUs from "./Pages/ContactUs";
 import Apply from "./Pages/Apply";
 import NotFound from "./Pages/NotFound";
-import Terms from "./Pages/terms";
+import Terms from "./Pages/Terms";
 import MentorForm from "./Pages/MentorForm";
 
 function App() {
