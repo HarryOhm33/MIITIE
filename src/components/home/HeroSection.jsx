@@ -20,7 +20,7 @@ const HeroSection = () => {
             <img
               src="https://www.dce-darbhanga.org/wp-content/uploads/2024/08/mo.jpg"
               alt="Hero Illustration"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transform scale-130"
               loading="lazy"
             />
           </div>
@@ -58,9 +58,9 @@ const HeroSection = () => {
             }}
           >
             MIITIE (Mithila Institute of Inclusive Technological Innovation &
-            Entrepreneurship) Incubation Centre provides the perfect launchpad
-            for student entrepreneurs to transform ideas into successful
-            ventures.
+            Entrepreneurship) Incubation Centre, Darbhanga College Of
+            Engineering, Darbhanga provides the perfect launchpad for student
+            entrepreneurs to transform ideas into successful ventures.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"

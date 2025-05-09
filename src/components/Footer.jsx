@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import {
-  FaFacebook,
+  FaYoutube,
   FaTwitter,
   FaLinkedin,
   FaInstagram,
@@ -18,23 +18,40 @@ const Footer = () => {
     { name: "Programs", path: "/programs" },
     { name: "Events", path: "/events" },
     { name: "Mentors", path: "/mentors" },
-    { name: "Contact", path: "/contact" },
+    { name: "Facilities", path: "/facilities" },
   ];
 
   const contactInfo = [
     {
       icon: <FaMapMarkerAlt />,
-      text: "Darbhanga College of Engineering, Darbhanga, Bihar - 846004",
+      text: "Heritage Building, Darbhanga College of Engineering, Darbhanga, Bihar - 846005",
     },
-    { icon: <FaPhoneAlt />, text: "+91 1234567890" },
-    { icon: <FaEnvelope />, text: "incubation@dce.ac.in" },
+    {
+      icon: <FaPhoneAlt />,
+      text: "+91-7004906223",
+      link: "tel:+917004906223",
+    },
+    {
+      icon: <FaEnvelope />,
+      text: "miitiedarbhanga0407@gmail.com",
+      link: "mailto:miitiedarbhanga0407@gmail.com",
+    },
   ];
 
   const socialLinks = [
-    { icon: <FaFacebook size={20} />, url: "#" },
-    { icon: <FaTwitter size={20} />, url: "#" },
-    { icon: <FaLinkedin size={20} />, url: "#" },
-    { icon: <FaInstagram size={20} />, url: "#" },
+    {
+      icon: <FaYoutube size={20} />,
+      url: "https://www.youtube.com/channel/UC1qosWn6v4BrixCmpdxMVUQ",
+    },
+    { icon: <FaTwitter size={20} />, url: "https://x.com/miitie_mithila" },
+    {
+      icon: <FaLinkedin size={20} />,
+      url: "https://www.linkedin.com/in/m-i-i-t-i-e-752458280/",
+    },
+    {
+      icon: <FaInstagram size={20} />,
+      url: "https://www.instagram.com/miitie_mithila/",
+    },
   ];
 
   const containerVariants = {
@@ -94,8 +111,10 @@ const Footer = () => {
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
-                  to={social.url}
-                  className="text-gray-300 hover:text-orange-400 transition-colors"
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-300 hover:text-orange-400 transition-colors cursor-pointer"
                   whileHover={{
                     y: -3,
                     scale: 1.2,
@@ -152,7 +171,18 @@ const Footer = () => {
                   whileHover={{ x: 5 }}
                 >
                   <span className="text-orange-400 mr-3 mt-1">{item.icon}</span>
-                  <span className="text-gray-300">{item.text}</span>
+                  {item.link ? (
+                    <a
+                      href={item.link}
+                      className="text-gray-300 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.text}
+                    </a>
+                  ) : (
+                    <span className="text-gray-300">{item.text}</span>
+                  )}
                 </motion.li>
               ))}
             </ul>
@@ -164,8 +194,8 @@ const Footer = () => {
           variants={itemVariants}
         >
           <p>
-            &copy; {new Date().getFullYear()} MIITIE Startup Incubation Centre,
-            DCE Darbhanga. All Rights Reserved.
+            &copy; {new Date().getFullYear()} MIITIE Incubation Centre, DCE
+            Darbhanga. All Rights Reserved.
           </p>
         </motion.div>
       </div>

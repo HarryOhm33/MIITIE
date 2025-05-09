@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { FaLightbulb, FaRocket } from "react-icons/fa";
+import { useEffect } from "react";
 
 const IncubationPrograms = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const programs = [
     {
       title: "Pre-Incubation Program",
@@ -30,7 +35,6 @@ const IncubationPrograms = () => {
       ],
     },
   ];
-  
 
   const containerVariants = {
     hidden: { opacity: 0 },

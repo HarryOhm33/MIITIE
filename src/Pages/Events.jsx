@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaMapMarkerAlt, FaRegClock } from "react-icons/fa";
+import { useEffect } from "react";
 
 const Events = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const upcomingEvents = [
     {
       title: "Startup Bootcamp 2023",

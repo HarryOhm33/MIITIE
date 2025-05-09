@@ -6,10 +6,17 @@ import {
   FaPhone,
   FaUsers,
 } from "react-icons/fa";
+import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import ankitKumar from "../assets/faculty-img/ankit-kumar.jpg";
+import suryaPrakash from "../assets/faculty-img/surya-prakash.jpeg";
+import sandeepTiwari from "../assets/faculty-img/sandeep-tiwari.jpeg"; // Update path if different
 
 const About = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: true,
@@ -43,13 +50,13 @@ const About = () => {
       id: 1,
       name: "Prof. (Dr.) Sandeep Tiwari",
       designation: "Principal, DCE Darbhanga",
-      mobile: "", // Add if available
-      email: "", // Add if available
-      image: "/faculty/sandeep.jpg", // Update path if different
+      mobile: "+91-9891460727", // Add if available
+      email: "dcedbg@rediffmail.com", // Add if available
+      image: sandeepTiwari, // Update path if different
     },
     {
       id: 2,
-      name: "Mr. Ankit Kumar",
+      name: "Asst. Prof. Ankit Kumar (Mech. Engg.)",
       designation: "Faculty Incharge, Startup Cell",
       mobile: "+91-7250840578",
       email: "ankitkr606@gmail.com",
@@ -59,16 +66,16 @@ const About = () => {
       id: 3,
       name: "Mr. Surya Prakash",
       designation: "Startup Cell Coordinator",
-      mobile: "7004906223",
+      mobile: "+91-7004906223",
       email: "suryaind22@gmail.com",
-      image: "/faculty/surya.jpg",
+      image: suryaPrakash,
     },
   ];
 
   const features = [
     {
       icon: <FaLightbulb className="text-4xl text-orange-500" />,
-      title: "Innovation Support",
+      title: "Incubation Support",
       description:
         "We nurture groundbreaking ideas and help transform them into viable businesses",
     },
@@ -223,7 +230,7 @@ const About = () => {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-1 gap-8 max-w-4xl mx-auto">
             {facultyMembers.map((member) => (
               <motion.div
                 key={member.id}
@@ -296,7 +303,7 @@ const About = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               ["25+", "Startups"],
-              ["₹5Cr+", "Funding Raised"],
+              ["₹3Cr+", "Funding Raised"],
               ["100+", "Jobs Created"],
               ["15+", "Industry Partners"],
             ].map(([number, label], i) => (

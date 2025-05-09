@@ -1,5 +1,7 @@
 import abhinavJha from "./success-img/abhinav-jha.jpg"; // Adjust the path as necessary
 import atulAnand from "./success-img/atul-anand.jpg"; // Adjust the path as necessary
+import allamFaraz from "./success-img/allam-faraz.jpg"; // Adjust the path as necessary
+import manoharKumar from "./success-img/manohar-kumar.jpg"; // Adjust the path as necessary
 
 const testimonials = [
   {
@@ -33,32 +35,20 @@ const testimonials = [
   MIITTIE has not just helped us grow—they’ve helped us dream bigger and act bolder. For that, I remain sincerely thankful. It’s collaborations like these that truly ignite the spirit of local entrepreneurship and turn ideas into impactful realities.`,
   },
   {
-    image: "https://randomuser.me/api/portraits/men/52.jpg",
+    image: allamFaraz, // Replace with actual image URL if available
     quote:
-      "MIITIE gave us not only a platform but also a strong network and industry connections.",
-    author: "Aman Verma",
-    company: "CTO, HealthHive",
-    extendedQuote: `As healthcare professionals trying to build a tech solution, we faced skepticism from both the medical and tech communities. MIITIE provided the perfect neutral ground where both sides could collaborate.
-
-The center's partnerships with local hospitals gave us access to real clinical environments where we could test our patient management system. The monthly demo days forced us to continually improve our product based on direct feedback from doctors and nurses.
-
-Through MIITIE's corporate partnership program, we connected with a major EHR provider that eventually became our first enterprise client. The legal assistance we received helped us navigate complex healthcare regulations and data privacy requirements.
-
-Two years later, our system is used in 17 clinics across North India, reducing patient wait times by 40% and improving record accuracy. We still participate in MIITIE's mentorship program, now as advisors to new healthcare startups.`,
+      "I am deeply grateful to MIITIE for being a constant pillar of support throughout our startup journey.",
+    author: "Abdul Allam Faraz",
+    company: "Founder, SHHE FOODS Pvt. Ltd.",
+    extendedQuote: `I am deeply grateful to MIITIE for being a constant pillar of support throughout our startup journey. From mentoring and networking opportunities to access to resources and market linkages, MIITIE played a crucial role in shaping the growth trajectory of SHHE FOODS Pvt. Ltd. Their belief in our vision gave us the confidence to scale and innovate in the food sector. I wholeheartedly thank the entire MIITIE team for their invaluable guidance and unwavering support.`,
   },
   {
-    image: "https://randomuser.me/api/portraits/women/56.jpg",
+    image: manoharKumar, // Replace with actual image if available
     quote:
-      "Being part of MIITIE boosted our credibility and helped us scale faster than we imagined.",
-    author: "Neha Jaiswal",
-    company: "CEO, CleanEarth Tech",
-    extendedQuote: `As a woman-led environmental startup, we initially struggled to be taken seriously in the waste management sector. MIITIE's Women Entrepreneurship Initiative provided targeted support, including access to female investors and industry leaders.
-
-The center's lab facilities allowed us to develop and test our plastic recycling process at small scale before seeking manufacturing partners. The business model workshops helped us identify the most sustainable revenue streams.
-
-MIITIE's brand association opened doors with municipal corporations that would have otherwise been closed to a young startup. Our first city contract came directly through a connection made at a MIITIE networking event.
-
-Today, we process over 5 tons of plastic waste daily, employing 45 women from underserved communities. We've expanded to three cities and are in talks to license our technology to other states. The confidence and skills we gained at MIITIE continue to drive our growth.`,
+      "MIITIE inspired me to form a company and helped us get seed funding from Startup Bihar.",
+    author: "Manohar Kumar",
+    company: "Founder, IRO",
+    extendedQuote: `I am Manohar Kumar, founder of IRO. I used to communicate science through science shows for the last 13 years, but MIITIE inspired me to form a company and got the seed from Startup Bihar. Now IRO conducts science shows all over India, thanks to MIITIE.`,
   },
 ];
 

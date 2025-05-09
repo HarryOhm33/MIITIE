@@ -5,8 +5,13 @@ import {
   FaDesktop,
   FaWifi,
 } from "react-icons/fa";
+import { useEffect } from "react";
 
 const Facilities = () => {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const facilities = [
     {
       title: "Coworking Space",
