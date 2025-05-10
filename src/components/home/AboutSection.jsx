@@ -94,8 +94,6 @@ const AboutSection = () => {
             ))}
           </div>
         </motion.div>
-
-        {/* <ProgramCards /> */}
       </div>
     </section>
   );

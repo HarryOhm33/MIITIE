@@ -1,113 +1,121 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { FiArrowRight } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import img1 from "../../assets/hero-img/img1.jpg";
+import img2 from "../../assets/hero-img/img2.jpg";
+import img3 from "../../assets/hero-img/img3.jpg";
+
+const slides = [
+  { src: img1, alt: "Students working at MIITIE" },
+  { src: img2, alt: "Incubation center facilities" },
+  { src: img3, alt: "Entrepreneurship workshop" },
+];
 
 const HeroSection = () => {
-  return (
-    <section className="relative bg-gradient-to-r from-orange-50 to-yellow-50 py-28">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
-        <motion.div
-          className="md:w-1/2 flex justify-center order-1 md:order-2 mb-10 md:mb-0"
-          initial={{ opacity: 0, x: 80 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 1,
-            ease: [0.16, 1, 0.3, 1],
-            delay: 0.2,
-          }}
-        >
-          <div className="bg-orange-100 rounded-lg w-full max-w-md h-64 md:h-80 flex items-center justify-center overflow-hidden">
-            <img
-              src="https://www.dce-darbhanga.org/wp-content/uploads/2024/08/mo.jpg"
-              alt="Hero Illustration"
-              className="w-full h-full object-cover transform scale-130"
-              loading="lazy"
-            />
-          </div>
-        </motion.div>
+  const [currentIndex, setCurrentIndex] = useState(0);
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="relative h-[90vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+      {/* Background Slideshow */}
+      <div className="absolute inset-0 z-0">
+        {slides.map((slide, index) => (
+          <motion.div
+            key={index}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: index === currentIndex ? 1 : 0,
+              transition: { duration: 1.5 },
+            }}
+          >
+            <img
+              src={slide.src}
+              alt={slide.alt}
+              className="w-full h-full object-cover"
+              loading="eager"
+            />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Dark Overlay */}
+      <div className="absolute inset-0 bg-black/50 z-1" />
+
+      {/* Content Container */}
+      <div className="container mx-auto px-4 z-10 relative text-center">
         <motion.div
-          className="md:w-1/2 order-2 md:order-1"
-          initial={{ opacity: 0, x: -80 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{
-            duration: 1,
-            ease: [0.16, 1, 0.3, 1],
-          }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="max-w-3xl mx-auto"
         >
-          <motion.h1
-            className="text-4xl md:text-5xl font-bold text-gray-800 mb-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.3,
-              duration: 0.8,
-              ease: [0.16, 1, 0.3, 1],
-            }}
-          >
-            Igniting <span className="text-orange-500">Innovation</span> at DCE
-          </motion.h1>
-          <motion.p
-            className="text-lg text-gray-600 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.5,
-              duration: 0.8,
-              ease: "easeOut",
-            }}
-          >
-            MIITIE (Mithila Institute of Inclusive Technological Innovation &
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+            Igniting <span className="text-orange-400">Innovation</span> at DCE
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-200 mb-10 leading-relaxed">
+            MIITE (Mithila Institute of Inclusive Technological Innovation &
             Entrepreneurship) Incubation Centre, Darbhanga College Of
             Engineering, Darbhanga provides the perfect launchpad for student
             entrepreneurs to transform ideas into successful ventures.
-          </motion.p>
-          <motion.div
-            className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ staggerChildren: 0.1 }}
-          >
-            <motion.div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-              <Link to="/apply">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors cursor-pointer text-center"
-                >
-                  Apply for Incubation
-                </motion.div>
-              </Link>
+          </p>
 
-              <Link to="/programs">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 border border-orange-500 text-orange-500 font-medium rounded-md hover:bg-orange-50 transition-colors cursor-pointer text-center"
-                >
-                  Explore Programs
-                </motion.div>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+            <Link to="/apply">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors shadow-lg"
+              >
+                Apply for Incubation
+              </motion.button>
+            </Link>
+
+            <Link to="/programs">
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="px-8 py-3 bg-transparent border-2 border-white text-white font-medium rounded-md hover:bg-white/10 transition-colors"
+              >
+                Explore Programs
+              </motion.button>
+            </Link>
+          </div>
+
           <motion.div
-            className="mt-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              delay: 0.8,
-              duration: 0.8,
-              ease: "easeOut",
-            }}
+            whileHover={{ x: 5 }}
+            transition={{ type: "spring", stiffness: 300 }}
           >
             <Link
               to="/notifications"
-              className="inline-block bg-yellow-100 text-yellow-800 px-5 py-2 rounded-full text-base font-medium shadow-sm hover:bg-yellow-200 transition duration-300"
+              className="inline-flex items-center text-white hover:text-orange-300 font-medium transition-colors"
             >
-              🔔 View Latest Notifications
+              View Latest Notifications <FiArrowRight className="ml-2" />
             </Link>
           </motion.div>
         </motion.div>
+      </div>
+
+      {/* Slide Indicators */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2 z-10">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all ${
+              index === currentIndex ? "bg-orange-400 w-6" : "bg-white/50"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
       </div>
     </section>
   );
