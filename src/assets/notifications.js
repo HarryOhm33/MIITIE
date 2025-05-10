@@ -7,7 +7,6 @@ export const notifications = [
       "Applications for our next incubation cohort are now open. Deadline for submissions is June 30.",
     isImportant: true,
     isNew: true,
-    category: "program",
   },
   {
     id: 2,
@@ -17,7 +16,6 @@ export const notifications = [
       "Schedule your mentor matching session for personalized startup guidance.",
     isImportant: false,
     isNew: true,
-    category: "event",
   },
   {
     id: 3,
@@ -27,7 +25,6 @@ export const notifications = [
       "Learn how to pitch to investors and secure funding for your startup.",
     isImportant: true,
     isNew: false,
-    category: "workshop",
   },
   {
     id: 4,
@@ -36,7 +33,6 @@ export const notifications = [
     description: "Save the date for our next cohort's Demo Day presentations.",
     isImportant: false,
     isNew: false,
-    category: "event",
   },
   {
     id: 5,
@@ -46,7 +42,6 @@ export const notifications = [
       "Our expanded co-working space is now available for all incubated startups.",
     isImportant: false,
     isNew: true,
-    category: "facility",
   },
   {
     id: 6,
@@ -56,14 +51,5 @@ export const notifications = [
       "Opportunity to network with angel investors and venture capitalists.",
     isImportant: true,
     isNew: true,
-    category: "event",
   },
-];
-
-export const categories = [
-  { id: "all", name: "All Notifications" },
-  { id: "program", name: "Program Updates" },
-  { id: "event", name: "Events" },
-  { id: "workshop", name: "Workshops" },
-  { id: "facility", name: "Facility Updates" },
 ];
