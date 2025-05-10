@@ -1,38 +1,21 @@
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaMapMarkerAlt, FaRegClock } from "react-icons/fa";
 import { useEffect } from "react";
+import { events } from "../assets/events";
+import { Link } from "react-router-dom";
 
 const Events = () => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const upcomingEvents = [
-    {
-      title: "Startup Bootcamp 2023",
-      date: "15 Nov 2023",
-      time: "10:00 AM - 4:00 PM",
-      location: "DCE Auditorium",
-      description: "Intensive workshop on lean startup methodologies",
-      image: "/event-bootcamp.jpg",
-    },
-    {
-      title: "Investor Connect",
-      date: "28 Nov 2023",
-      time: "2:00 PM - 5:00 PM",
-      location: "Incubation Centre",
-      description: "Networking session with angel investors and VCs",
-      image: "/event-investor.jpg",
-    },
-  ];
+  const upcomingEvents = events.filter((event) => event.isUpcoming);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
+      transition: { staggerChildren: 0.2 },
     },
   };
 
@@ -65,7 +48,6 @@ const Events = () => {
             whileInView={{ scaleX: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            style={{ transformOrigin: "center" }}
           />
         </motion.div>
 
@@ -77,18 +59,17 @@ const Events = () => {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 gap-8"
         >
-          {upcomingEvents.map((event, index) => (
+          {upcomingEvents.map((event) => (
             <motion.div
-              key={index}
+              key={event.id}
               variants={cardVariants}
-              whileHover={{ scale: 1 }}
-              className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
+              className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
             >
               <div className="h-56 w-full overflow-hidden">
                 <img
                   src={event.image}
-                  alt={event.title}
-                  className="w-full h-full object-cover"
+                  alt={event.alt}
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
@@ -128,9 +109,12 @@ const Events = () => {
           transition={{ duration: 0.6 }}
           className="text-center mt-12"
         >
-          <button className="px-8 py-3 bg-yellow-400 text-gray-800 font-medium rounded-md hover:bg-yellow-500 transition-colors">
+          <Link
+            to="/past-events"
+            className="inline-block px-8 py-3 bg-yellow-400 text-gray-800 font-medium rounded-md hover:bg-yellow-500 transition-colors"
+          >
             View Past Events
-          </button>
+          </Link>
         </motion.div>
       </div>
     </section>

@@ -13,6 +13,7 @@ import Apply from "./Pages/Apply";
 import NotFound from "./Pages/NotFound";
 import Terms from "./Pages/Terms";
 import MentorForm from "./Pages/MentorForm";
+import PastEvents from "./Pages/PastEvents";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/programs" element={<IncubationPrograms />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/past-events" element={<PastEvents />} />
             <Route path="/mentors" element={<AdvisorsMentors />} />
             <Route path="/mentor-form" element={<MentorForm />} />
             <Route path="/facilities" element={<Facilities />} />-
