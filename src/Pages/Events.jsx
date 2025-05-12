@@ -5,18 +5,102 @@ import {
   FaRegClock,
   FaUserPlus,
   FaTimes,
-  FaSearchPlus,
-  FaSearchMinus,
 } from "react-icons/fa";
 import { useEffect, useState, useRef } from "react";
 import { events } from "../assets/events";
 import { Link } from "react-router-dom";
+import { useGesture } from "@use-gesture/react";
+import { useSpring, animated } from "@react-spring/web";
+
+const ZoomableImage = ({ src, alt, onClose }) => {
+  const imgRef = useRef(null);
+  const [{ x, y, scale }, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    scale: 1,
+    config: { tension: 300, friction: 30 },
+  }));
+
+  const bind = useGesture(
+    {
+      onDrag: ({ offset: [dx, dy], event }) => {
+        event.preventDefault();
+        api.start({ x: dx, y: dy });
+      },
+      onPinch: ({ offset: [d], event }) => {
+        event.preventDefault();
+        api.start({ scale: d });
+      },
+      onWheel: ({ delta: [, dy], event }) => {
+        event.preventDefault();
+        api.start({
+          scale: Math.max(0.5, Math.min(5, scale.get() - dy * 0.002)),
+        });
+      },
+      onDoubleClick: ({ event }) => {
+        event.preventDefault();
+        api.start({ scale: scale.get() > 1 ? 1 : 2, x: 0, y: 0 });
+      },
+    },
+    {
+      drag: {
+        from: () => [x.get(), y.get()],
+        bounds: () => {
+          const currentScale = scale.get();
+          if (currentScale <= 1)
+            return { left: 0, right: 0, top: 0, bottom: 0 };
+
+          const img = imgRef.current;
+          if (!img) return { left: 0, right: 0, top: 0, bottom: 0 };
+
+          const width = img.offsetWidth;
+          const height = img.offsetHeight;
+          const scaledWidth = width * currentScale;
+          const scaledHeight = height * currentScale;
+
+          return {
+            left: -(scaledWidth - width) / 2,
+            right: (scaledWidth - width) / 2,
+            top: -(scaledHeight - height) / 2,
+            bottom: (scaledHeight - height) / 2,
+          };
+        },
+        rubberband: 0.1,
+      },
+      pinch: {
+        scaleBounds: { min: 0.5, max: 5 },
+        rubberband: true,
+      },
+      wheel: {
+        eventOptions: { passive: false },
+      },
+    }
+  );
+
+  return (
+    <div className="w-full h-full flex items-center justify-center overflow-hidden touch-none">
+      <animated.img
+        {...bind()}
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        style={{
+          x,
+          y,
+          scale,
+          touchAction: "none",
+          cursor: scale.get() > 1 ? "grab" : "default",
+        }}
+        className="object-contain max-h-[90vh] max-w-full select-none"
+        draggable={false}
+      />
+    </div>
+  );
+};
 
 const Events = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [zoom, setZoom] = useState(1);
-  const imageContainerRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -28,20 +112,11 @@ const Events = () => {
     setFullscreenImage({ image, alt });
     setIsFullscreen(true);
     document.body.style.overflow = "hidden";
-    setZoom(1); // Reset zoom
   };
 
   const closeFullscreen = () => {
     setIsFullscreen(false);
     document.body.style.overflow = "auto";
-    setZoom(1);
-  };
-
-  const handleWheelZoom = (e) => {
-    if (!isFullscreen) return;
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? -0.1 : 0.1;
-    setZoom((prev) => Math.min(3, Math.max(0.5, prev + delta)));
   };
 
   const containerVariants = {
@@ -99,13 +174,13 @@ const Events = () => {
               className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
             >
               <div
-                className="relative h-56 w-full overflow-hidden group cursor-pointer"
+                className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
                 onClick={() => openFullscreen(event.image, event.alt)}
               >
                 <img
                   src={event.image}
                   alt={event.alt}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <div className="p-6">
@@ -113,7 +188,6 @@ const Events = () => {
                   {event.title}
                 </h3>
                 <p className="text-gray-600 mb-4">{event.description}</p>
-
                 <div className="flex flex-wrap gap-4 mt-4 text-sm">
                   <div className="flex items-center text-gray-600">
                     <FaCalendarAlt className="mr-2 text-orange-500" />
@@ -134,7 +208,6 @@ const Events = () => {
                     </div>
                   )}
                 </div>
-
                 {event.registrationRequired ? (
                   <a
                     href={event.registrationLink}
@@ -172,64 +245,35 @@ const Events = () => {
 
         {/* Fullscreen Image Viewer */}
         <AnimatePresence>
-          {isFullscreen && fullscreenImage && (
+          {isFullscreen && (
             <motion.div
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
               onClick={closeFullscreen}
-              onWheel={handleWheelZoom}
+              transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="relative w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center"
-                initial={{ scale: 0.9 }}
+                className="relative w-full h-full max-w-6xl max-h-[90vh]"
+                initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
-                exit={{ scale: 0.9 }}
+                exit={{ scale: 0.95 }}
                 transition={{ duration: 0.3 }}
                 onClick={(e) => e.stopPropagation()}
-                ref={imageContainerRef}
               >
-                {/* Close Button */}
                 <button
-                  className="absolute top-4 right-4 z-10 text-white hover:text-orange-400 transition-colors"
+                  className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-orange-600 p-2 rounded-full shadow-lg transition-colors"
                   onClick={closeFullscreen}
                   aria-label="Close fullscreen"
                 >
-                  <FaTimes className="text-3xl" />
+                  <FaTimes className="text-xl" />
                 </button>
-
-                {/* Zoom Buttons (mobile) */}
-                <div className="absolute bottom-4 left-4 flex gap-4 sm:hidden">
-                  <button
-                    className="bg-white/90 text-orange-600 p-2 rounded-full shadow"
-                    onClick={() => setZoom((prev) => Math.min(3, prev + 0.2))}
-                  >
-                    <FaSearchPlus />
-                  </button>
-                  <button
-                    className="bg-white/90 text-orange-600 p-2 rounded-full shadow"
-                    onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.2))}
-                  >
-                    <FaSearchMinus />
-                  </button>
-                </div>
-
-                {/* Zoomable Image */}
-                <motion.div
-                  drag
-                  dragMomentum={false}
-                  className="cursor-grab active:cursor-grabbing max-h-full max-w-full overflow-hidden"
-                  style={{ scale: zoom }}
-                >
-                  <img
-                    src={fullscreenImage.image}
-                    alt={fullscreenImage.alt}
-                    className="object-contain max-h-[90vh] max-w-full select-none pointer-events-none"
-                    draggable={false}
-                  />
-                </motion.div>
+                <ZoomableImage
+                  src={fullscreenImage.image}
+                  alt={fullscreenImage.alt}
+                  onClose={closeFullscreen}
+                />
               </motion.div>
             </motion.div>
           )}

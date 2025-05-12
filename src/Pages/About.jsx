@@ -56,8 +56,8 @@ const About = () => {
     },
     {
       id: 2,
-      name: "Asst. Prof. Ankit Kumar (Mech. Engg.)",
-      designation: "Faculty Incharge, Startup Cell",
+      name: "Mr. Ankit Kumar",
+      designation: "Assistant Professor, Mechanical Engineering",
       mobile: "+91-7250840578",
       email: "ankitkr606@gmail.com",
       image: ankitKumar,
