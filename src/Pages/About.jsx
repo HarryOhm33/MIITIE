@@ -50,14 +50,15 @@ const About = () => {
       id: 1,
       name: "Prof. (Dr.) Sandeep Tiwari",
       designation: "Principal, DCE Darbhanga",
-      mobile: "+91-9891460727", // Add if available
-      email: "dcedbg@rediffmail.com", // Add if available
-      image: sandeepTiwari, // Update path if different
+      mobile: "+91-9891460727",
+      email: "dcedbg@rediffmail.com",
+      image: sandeepTiwari,
     },
     {
       id: 2,
       name: "Mr. Ankit Kumar",
       designation: "Assistant Professor, Mechanical Engineering",
+      coDesignation: "Incharge, Start-up Cell & Incubation Centre",
       mobile: "+91-7250840578",
       email: "ankitkr606@gmail.com",
       image: ankitKumar,
@@ -260,10 +261,15 @@ const About = () => {
                     <h3 className="text-xl font-bold text-gray-800">
                       {member.name}
                     </h3>
-                    <p className="text-orange-500 font-medium mb-4">
+                    <p className="text-orange-500 font-medium">
                       {member.designation}
                     </p>
-                    <div className="space-y-2">
+                    {member.coDesignation && (
+                      <p className="text-sm text-gray-600 italic mb-2">
+                        {member.coDesignation}
+                      </p>
+                    )}
+                    <div className="space-y-2 mt-2">
                       <div className="flex items-center text-gray-600">
                         <FaPhone className="mr-2 text-orange-500" />
                         <a

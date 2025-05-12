@@ -14,6 +14,7 @@ import { useSpring, animated } from "@react-spring/web";
 
 const ZoomableImage = ({ src, alt, onClose }) => {
   const imgRef = useRef(null);
+  const containerRef = useRef(null);
   const [{ x, y, scale }, api] = useSpring(() => ({
     x: 0,
     y: 0,
@@ -23,8 +24,12 @@ const ZoomableImage = ({ src, alt, onClose }) => {
 
   const bind = useGesture(
     {
-      onDrag: ({ offset: [dx, dy], event }) => {
+      onDrag: ({ offset: [dx, dy], event, tap }) => {
         event.preventDefault();
+        if (tap && scale.get() <= 1) {
+          onClose();
+          return;
+        }
         api.start({ x: dx, y: dy });
       },
       onPinch: ({ offset: [d], event }) => {
@@ -34,12 +39,13 @@ const ZoomableImage = ({ src, alt, onClose }) => {
       onWheel: ({ delta: [, dy], event }) => {
         event.preventDefault();
         api.start({
-          scale: Math.max(0.5, Math.min(5, scale.get() - dy * 0.002)),
+          scale: Math.max(0.5, Math.min(5, scale.get() - dy * 0.005)), // Increased sensitivity
         });
       },
       onDoubleClick: ({ event }) => {
         event.preventDefault();
-        api.start({ scale: scale.get() > 1 ? 1 : 2, x: 0, y: 0 });
+        const newScale = scale.get() > 1 ? 1 : 2;
+        api.start({ scale: newScale, x: 0, y: 0 });
       },
     },
     {
@@ -78,7 +84,15 @@ const ZoomableImage = ({ src, alt, onClose }) => {
   );
 
   return (
-    <div className="w-full h-full flex items-center justify-center overflow-hidden touch-none">
+    <div
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center overflow-hidden touch-none"
+      onClick={(e) => {
+        if (e.target === containerRef.current && scale.get() <= 1) {
+          onClose();
+        }
+      }}
+    >
       <animated.img
         {...bind()}
         ref={imgRef}
@@ -251,7 +265,11 @@ const Events = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={closeFullscreen}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  closeFullscreen();
+                }
+              }}
               transition={{ duration: 0.3 }}
             >
               <motion.div
@@ -260,7 +278,6 @@ const Events = () => {
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                onClick={(e) => e.stopPropagation()}
               >
                 <button
                   className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-orange-600 p-2 rounded-full shadow-lg transition-colors"

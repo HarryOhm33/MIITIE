@@ -14,16 +14,14 @@ export const facilities = [
     icon: "FaDesktop",
     description:
       "Modern workstations with high-speed internet for collaborative work",
-    image:
-      "https://images.unsplash.com/photo-1603791440384-56cd371ee9a7?auto=format&fit=crop&w=800&q=80",
+    image: img1,
   },
   {
     title: "Meeting Rooms",
     icon: "FaChalkboardTeacher",
     description:
       "Equipped with presentation tools for client meetings and discussions",
-    image:
-      "https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=800&q=80",
+    image: img2,
   },
   {
     title: "High-Speed Internet",
