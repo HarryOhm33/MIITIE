@@ -9,12 +9,137 @@ import {
   FaChevronRight,
   FaExpand,
 } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { facilities, galleryImages } from "../assets/facilities";
+import { useGesture } from "@use-gesture/react";
+import { useSpring, animated } from "@react-spring/web";
+
+const ZoomableImage = ({ src, alt, onClose, onNext, onPrev }) => {
+  const imgRef = useRef(null);
+  const containerRef = useRef(null);
+  const [{ x, y, scale }, api] = useSpring(() => ({
+    x: 0,
+    y: 0,
+    scale: 1,
+    config: { tension: 300, friction: 30 },
+  }));
+
+  const bind = useGesture(
+    {
+      onDrag: ({
+        offset: [dx, dy],
+        event,
+        tap,
+        direction: [xDir],
+        velocity,
+      }) => {
+        event.preventDefault();
+
+        // Handle swipe navigation when not zoomed
+        if (scale.get() <= 1) {
+          if (tap) {
+            onClose();
+            return;
+          }
+
+          // If swiped horizontally with enough velocity
+          if (Math.abs(xDir) > 0 && velocity > 0.3) {
+            if (xDir > 0) {
+              onPrev();
+            } else {
+              onNext();
+            }
+            return;
+          }
+        }
+
+        // Normal drag behavior when zoomed
+        api.start({ x: dx, y: dy });
+      },
+      onPinch: ({ offset: [d], event }) => {
+        event.preventDefault();
+        api.start({ scale: d });
+      },
+      onWheel: ({ delta: [, dy], event }) => {
+        event.preventDefault();
+        api.start({
+          scale: Math.max(0.5, Math.min(5, scale.get() - dy * 0.005)),
+        });
+      },
+      onDoubleClick: ({ event }) => {
+        event.preventDefault();
+        const newScale = scale.get() > 1 ? 1 : 2;
+        api.start({ scale: newScale, x: 0, y: 0 });
+      },
+    },
+    {
+      drag: {
+        from: () => [x.get(), y.get()],
+        bounds: () => {
+          const currentScale = scale.get();
+          if (currentScale <= 1)
+            return { left: 0, right: 0, top: 0, bottom: 0 };
+
+          const img = imgRef.current;
+          if (!img) return { left: 0, right: 0, top: 0, bottom: 0 };
+
+          const width = img.offsetWidth;
+          const height = img.offsetHeight;
+          const scaledWidth = width * currentScale;
+          const scaledHeight = height * currentScale;
+
+          return {
+            left: -(scaledWidth - width) / 2,
+            right: (scaledWidth - width) / 2,
+            top: -(scaledHeight - height) / 2,
+            bottom: (scaledHeight - height) / 2,
+          };
+        },
+        rubberband: 0.1,
+      },
+      pinch: {
+        scaleBounds: { min: 0.5, max: 5 },
+        rubberband: true,
+      },
+      wheel: {
+        eventOptions: { passive: false },
+      },
+    }
+  );
+
+  return (
+    <div
+      ref={containerRef}
+      className="w-full h-full flex items-center justify-center overflow-hidden touch-none"
+      onClick={(e) => {
+        if (e.target === containerRef.current && scale.get() <= 1) {
+          onClose();
+        }
+      }}
+    >
+      <animated.img
+        {...bind()}
+        ref={imgRef}
+        src={src}
+        alt={alt}
+        style={{
+          x,
+          y,
+          scale,
+          touchAction: "none",
+          cursor: scale.get() > 1 ? "grab" : "default",
+        }}
+        className="object-contain max-h-[90vh] max-w-full select-none"
+        draggable={false}
+      />
+    </div>
+  );
+};
 
 const Facilities = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(null);
   const [direction, setDirection] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -22,11 +147,12 @@ const Facilities = () => {
 
   const openLightbox = (index) => {
     setCurrentImageIndex(index);
+    setIsFullscreen(true);
     document.body.style.overflow = "hidden";
   };
 
   const closeLightbox = () => {
-    setCurrentImageIndex(null);
+    setIsFullscreen(false);
     document.body.style.overflow = "auto";
   };
 
@@ -49,18 +175,18 @@ const Facilities = () => {
   // Auto-rotate gallery in lightbox
   useEffect(() => {
     let interval;
-    if (currentImageIndex !== null) {
+    if (isFullscreen) {
       interval = setInterval(() => {
         goToNext();
-      }, 5000);
+      }, 100000);
     }
     return () => clearInterval(interval);
-  }, [currentImageIndex]);
+  }, [isFullscreen, currentImageIndex]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (currentImageIndex !== null) {
+      if (isFullscreen) {
         if (e.key === "ArrowRight") goToNext();
         if (e.key === "ArrowLeft") goToPrev();
         if (e.key === "Escape") closeLightbox();
@@ -69,7 +195,7 @@ const Facilities = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [currentImageIndex]);
+  }, [isFullscreen, currentImageIndex]);
 
   const getIconComponent = (iconName) => {
     const icons = {
@@ -277,25 +403,27 @@ const Facilities = () => {
           </motion.div>
         </motion.div>
 
-        {/* Lightbox Modal */}
-        <AnimatePresence custom={direction}>
-          {currentImageIndex !== null && (
+        {/* Enhanced Lightbox Modal */}
+        <AnimatePresence>
+          {isFullscreen && currentImageIndex !== null && (
             <motion.div
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={closeLightbox}
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  closeLightbox();
+                }
+              }}
               transition={{ duration: 0.3 }}
             >
               <motion.div
-                className="relative w-full max-w-6xl h-full max-h-[90vh]"
-                custom={direction}
-                initial={{ x: direction > 0 ? 100 : -100, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: direction > 0 ? -100 : 100, opacity: 0 }}
+                className="relative w-full h-full max-w-6xl max-h-[90vh]"
+                initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
-                onClick={(e) => e.stopPropagation()}
               >
                 {/* Navigation Arrows */}
                 <motion.button
@@ -320,24 +448,22 @@ const Facilities = () => {
 
                 {/* Close Button */}
                 <motion.button
-                  className="absolute top-4 right-4 text-white hover:text-orange-400 transition-colors z-10"
+                  className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-orange-600 p-2 rounded-full shadow-lg transition-colors"
                   onClick={closeLightbox}
                   aria-label="Close lightbox"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
-                  <FaTimes className="text-3xl md:text-4xl" />
+                  <FaTimes className="text-xl" />
                 </motion.button>
 
-                {/* Current Image */}
-                <motion.img
+                {/* Current Image with Zoomable Component */}
+                <ZoomableImage
                   src={galleryImages[currentImageIndex].src}
                   alt={galleryImages[currentImageIndex].alt}
-                  className="w-full h-full max-h-[80vh] object-contain"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                  onClose={closeLightbox}
+                  onNext={goToNext}
+                  onPrev={goToPrev}
                 />
 
                 {/* Image Info */}
