@@ -5,14 +5,18 @@ import {
   FaRegClock,
   FaUserPlus,
   FaTimes,
+  FaSearchPlus,
+  FaSearchMinus,
 } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { events } from "../assets/events";
 import { Link } from "react-router-dom";
 
 const Events = () => {
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [zoom, setZoom] = useState(1);
+  const imageContainerRef = useRef(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -24,11 +28,20 @@ const Events = () => {
     setFullscreenImage({ image, alt });
     setIsFullscreen(true);
     document.body.style.overflow = "hidden";
+    setZoom(1); // Reset zoom
   };
 
   const closeFullscreen = () => {
     setIsFullscreen(false);
     document.body.style.overflow = "auto";
+    setZoom(1);
+  };
+
+  const handleWheelZoom = (e) => {
+    if (!isFullscreen) return;
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+    setZoom((prev) => Math.min(3, Math.max(0.5, prev + delta)));
   };
 
   const containerVariants = {
@@ -86,7 +99,7 @@ const Events = () => {
               className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
             >
               <div
-                className="relative h-56 w-full overflow-hidden cursor-pointer"
+                className="relative h-56 w-full overflow-hidden group cursor-pointer"
                 onClick={() => openFullscreen(event.image, event.alt)}
               >
                 <img
@@ -159,35 +172,64 @@ const Events = () => {
 
         {/* Fullscreen Image Viewer */}
         <AnimatePresence>
-          {isFullscreen && (
+          {isFullscreen && fullscreenImage && (
             <motion.div
               className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={closeFullscreen}
               transition={{ duration: 0.3 }}
+              onClick={closeFullscreen}
+              onWheel={handleWheelZoom}
             >
               <motion.div
                 className="relative w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center"
-                initial={{ scale: 0.95 }}
+                initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
+                exit={{ scale: 0.9 }}
                 transition={{ duration: 0.3 }}
                 onClick={(e) => e.stopPropagation()}
+                ref={imageContainerRef}
               >
+                {/* Close Button */}
                 <button
-                  className="absolute top-4 right-4 text-white hover:text-orange-400 transition-colors z-10"
+                  className="absolute top-4 right-4 z-10 text-white hover:text-orange-400 transition-colors"
                   onClick={closeFullscreen}
                   aria-label="Close fullscreen"
                 >
                   <FaTimes className="text-3xl" />
                 </button>
-                <img
-                  src={fullscreenImage.image}
-                  alt={fullscreenImage.alt}
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
-                />
+
+                {/* Zoom Buttons (mobile) */}
+                <div className="absolute bottom-4 left-4 flex gap-4 sm:hidden">
+                  <button
+                    className="bg-white/90 text-orange-600 p-2 rounded-full shadow"
+                    onClick={() => setZoom((prev) => Math.min(3, prev + 0.2))}
+                  >
+                    <FaSearchPlus />
+                  </button>
+                  <button
+                    className="bg-white/90 text-orange-600 p-2 rounded-full shadow"
+                    onClick={() => setZoom((prev) => Math.max(0.5, prev - 0.2))}
+                  >
+                    <FaSearchMinus />
+                  </button>
+                </div>
+
+                {/* Zoomable Image */}
+                <motion.div
+                  drag
+                  dragMomentum={false}
+                  className="cursor-grab active:cursor-grabbing max-h-full max-w-full overflow-hidden"
+                  style={{ scale: zoom }}
+                >
+                  <img
+                    src={fullscreenImage.image}
+                    alt={fullscreenImage.alt}
+                    className="object-contain max-h-[90vh] max-w-full select-none pointer-events-none"
+                    draggable={false}
+                  />
+                </motion.div>
               </motion.div>
             </motion.div>
           )}

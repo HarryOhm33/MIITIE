@@ -8,7 +8,7 @@ export const events = [
     time: "11:00 AM onwards",
     location: "Auditorium, DCE Darbhanga",
     description:
-      "An inspiring session on rural innovation and Atmanirbhar Bharat with eminent speakers including Sri Pradeep Kant Choudhary, Sri Kamal Taori (IAS Retd.), Dr. Suman Singh, and Ms. Kalpana Inamdar.",
+      "An inspiring session on rural innovation and Atmanirbhar Bharat with eminent speakers including Sri Kamal Taori (IAS Retd.), Ms. Kalpana Inamdar, Dr. Suman Singh and Sri Pradeep Kant Choudhary.",
     image: evt1, // Replace with actual hosted image URL
     alt: "Event invitation poster for Empowering Bharat at DCE Darbhanga",
     isUpcoming: true,
