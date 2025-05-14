@@ -66,7 +66,7 @@ const About = () => {
     {
       id: 3,
       name: "Mr. Surya Prakash",
-      designation: "Startup Cell Coordinator",
+      designation: "District Coordinator, Startup Cell",
       mobile: "+91-7004906223",
       email: "suryaind22@gmail.com",
       image: suryaPrakash,
