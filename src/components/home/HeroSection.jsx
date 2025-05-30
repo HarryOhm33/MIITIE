@@ -9,7 +9,7 @@ import img3 from "../../assets/hero-img/img3.jpg";
 const slides = [
   { src: img1, alt: "Students working at MIITIE" },
   { src: img2, alt: "Incubation center facilities" },
-  { src: img3, alt: "Entrepreneurship workshop" },
+ // { src: img3, alt: "Entrepreneurship workshop" },
 ];
 
 const HeroSection = () => {
