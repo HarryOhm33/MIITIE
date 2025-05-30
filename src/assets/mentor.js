@@ -1,8 +1,9 @@
-import naveenJha from "./mentor-img/naveen-jha.jpg"; // Adjust the path as necessary
-import ajayShukla from "./mentor-img/ajay-shukla.jpg"; // Adjust the path as necessary
-import pradeepChoudhary from "./mentor-img/pradeep-choudhary.jpg"; // Adjust the path as necessary
-import arvindJha from "./mentor-img/arvind-jha.jpg"; // Adjust the path as necessary
-import pkMishra from "./mentor-img/pk-mishra.png"; // Adjust the path as necessary
+import naveenJha from "./mentor-img/naveen-jha.jpg";
+import ajayShukla from "./mentor-img/ajay-shukla.jpg";
+import pradeepChoudhary from "./mentor-img/pradeep-choudhary.jpg";
+import arvindJha from "./mentor-img/arvind-jha.jpg";
+import pkMishra from "./mentor-img/pk-mishra.png";
+import rakeshJha from "./mentor-img/rakesh-jha.jpg"; // Add the image to your assets and adjust the path
 
 const advisors = [
   {
@@ -18,8 +19,8 @@ const advisors = [
     name: "Prof. P.K. Mishra",
     role: "Advisor",
     designation: "Professor (HAG), IIT BHU",
-    linkedin: "https://www.linkedin.com/in/pradeep-kumar-mishra-3399243/", // No LinkedIn link visible in the image
-    image: pkMishra, // Adjust the path to match your assets
+    linkedin: "https://www.linkedin.com/in/pradeep-kumar-mishra-3399243/",
+    image: pkMishra,
   },
   {
     id: 3,
@@ -44,6 +45,14 @@ const advisors = [
     designation: "Sr. Vice President, Spice Money",
     linkedin: "https://www.linkedin.com/in/ajay-suman-shukla-69534312/",
     image: ajayShukla,
+  },
+  {
+    id: 6,
+    name: "Sri Rakesh K Jha",
+    role: "Advisor",
+    designation: "Founder, Craftvala",
+    linkedin: "https://www.linkedin.com/in/rakeshkumarjha/", // Use the correct link if different
+    image: rakeshJha,
   },
 ];
 
