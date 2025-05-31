@@ -18,7 +18,9 @@ const Footer = () => {
     { name: "Programs", path: "/programs" },
     { name: "Events", path: "/events" },
     { name: "Mentors", path: "/mentors" },
+    { name: "Incubatees", path: "/incubatees" },
     { name: "Facilities", path: "/facilities" },
+    // { name: "Contact", path: "/contact" }, // Added missing contact link
   ];
 
   const contactInfo = [
@@ -94,7 +96,7 @@ const Footer = () => {
               whileHover={{ scale: 1.02 }}
             >
               <img
-                src={miitieLogo} // Make sure this path matches your actual logo file
+                src={miitieLogo}
                 alt="MIITIE Logo"
                 className="h-12 object-contain rounded-lg border-2 border-orange-300 p-0.5 mr-2"
               />
