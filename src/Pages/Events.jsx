@@ -181,64 +181,70 @@ const Events = () => {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 gap-8"
         >
-          {upcomingEvents.map((event) => (
-            <motion.div
-              key={event.id}
-              variants={cardVariants}
-              className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
-            >
-              <div
-                className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
-                onClick={() => openFullscreen(event.image, event.alt)}
+          {upcomingEvents.length > 0 ? (
+            upcomingEvents.map((event) => (
+              <motion.div
+                key={event.id}
+                variants={cardVariants}
+                className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
               >
-                <img
-                  src={event.image}
-                  alt={event.alt}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2 text-gray-800">
-                  {event.title}
-                </h3>
-                <p className="text-gray-600 mb-4">{event.description}</p>
-                <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                  <div className="flex items-center text-gray-600">
-                    <FaCalendarAlt className="mr-2 text-orange-500" />
-                    <span>{event.date}</span>
+                <div
+                  className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
+                  onClick={() => openFullscreen(event.image, event.alt)}
+                >
+                  <img
+                    src={event.image}
+                    alt={event.alt}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-2 text-gray-800">
+                    {event.title}
+                  </h3>
+                  <p className="text-gray-600 mb-4">{event.description}</p>
+                  <div className="flex flex-wrap gap-4 mt-4 text-sm">
+                    <div className="flex items-center text-gray-600">
+                      <FaCalendarAlt className="mr-2 text-orange-500" />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <FaRegClock className="mr-2 text-orange-500" />
+                      <span>{event.time}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <FaMapMarkerAlt className="mr-2 text-orange-500" />
+                      <span>{event.location}</span>
+                    </div>
+                    {event.registrationRequired && (
+                      <div className="flex items-center text-orange-500 font-medium">
+                        <FaUserPlus className="mr-2" />
+                        <span>Registration Required</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaRegClock className="mr-2 text-orange-500" />
-                    <span>{event.time}</span>
-                  </div>
-                  <div className="flex items-center text-gray-600">
-                    <FaMapMarkerAlt className="mr-2 text-orange-500" />
-                    <span>{event.location}</span>
-                  </div>
-                  {event.registrationRequired && (
-                    <div className="flex items-center text-orange-500 font-medium">
-                      <FaUserPlus className="mr-2" />
-                      <span>Registration Required</span>
+                  {event.registrationRequired ? (
+                    <a
+                      href={event.registrationLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-6 px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                    >
+                      Register Now
+                    </a>
+                  ) : (
+                    <div className="mt-6 px-6 py-2 bg-gray-100 text-gray-600 rounded-md">
+                      Open to all
                     </div>
                   )}
                 </div>
-                {event.registrationRequired ? (
-                  <a
-                    href={event.registrationLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-6 px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
-                  >
-                    Register Now
-                  </a>
-                ) : (
-                  <div className="mt-6 px-6 py-2 bg-gray-100 text-gray-600 rounded-md">
-                    Open to all
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          ) : (
+            <div className="text-center py-12 col-span-2">
+              <p className="text-gray-600">No upcoming events scheduled</p>
+            </div>
+          )}
         </motion.div>
 
         {/* View Past Events */}

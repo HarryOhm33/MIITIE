@@ -14,6 +14,7 @@ import NotFound from "./Pages/NotFound";
 import Terms from "./Pages/Terms";
 import MentorForm from "./Pages/MentorForm";
 import PastEvents from "./Pages/PastEvents";
+import Incubatees from "./Pages/Incubatees";
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
             <Route path="/past-events" element={<PastEvents />} />
             <Route path="/mentors" element={<AdvisorsMentors />} />
             <Route path="/mentor-form" element={<MentorForm />} />
-            <Route path="/facilities" element={<Facilities />} />-
+            <Route path="/facilities" element={<Facilities />} />
+            <Route path="/incubatees" element={<Incubatees />} />
             <Route path="/contact" element={<ContactUs />} />
             <Route path="/apply" element={<Apply />} />
             <Route path="/about" element={<About />} />
