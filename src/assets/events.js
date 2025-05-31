@@ -16,16 +16,16 @@ export const events = [
     registrationRequired: false,
   },
   {
-  id: 2,
-  title: "M.I.I.T.I.E Incubatee Meet – DCE Darbhanga",
-  date: "30 May 2025",
-  time: "3:00 PM onwards",
-  location: "Conference Room, DCE Darbhanga",
-  description:
-    "An exclusive interaction session with Sri Rakesh K Jha, Founder of Craftvala, focusing on empowering incubatees and aspiring entrepreneurs. Gain valuable insights into departmental solutions, networking, packaging innovations, marketing strategies, brand development, and financial management. A golden opportunity to learn, connect, and innovate for a self-reliant future.",
-  image: evt2, // Replace with actual hosted image URL
-  alt: "Poster for M.I.I.T.I.E Incubatee Meet at DCE Darbhanga",
-  isUpcoming: true,
-  registrationRequired: false,
-},
+    id: 2,
+    title: "M.I.I.T.I.E Incubatee Meet – DCE Darbhanga",
+    date: "30 May 2025",
+    time: "3:00 PM onwards",
+    location: "Conference Room, DCE Darbhanga",
+    description:
+      "An exclusive interaction session with Sri Rakesh K Jha, Founder of Craftvala, focusing on empowering incubatees and aspiring entrepreneurs. Gain valuable insights into departmental solutions, networking, packaging innovations, marketing strategies, brand development, and financial management. A golden opportunity to learn, connect, and innovate for a self-reliant future.",
+    image: evt2, // Replace with actual hosted image URL
+    alt: "Poster for M.I.I.T.I.E Incubatee Meet at DCE Darbhanga",
+    isUpcoming: false,
+    registrationRequired: false,
+  },
 ];
