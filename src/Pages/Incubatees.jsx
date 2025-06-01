@@ -76,6 +76,12 @@ const Incubatees = () => {
                       Brief Description
                     </th>
                     <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider">
+                      Sector
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider">
+                      Registered with Bihar Startup?
+                    </th>
+                    <th className="px-4 py-3 text-center text-sm font-medium text-gray-700 uppercase tracking-wider">
                       Links
                     </th>
                   </tr>
@@ -107,6 +113,16 @@ const Incubatees = () => {
                       <td className="px-4 py-4">
                         <div className="text-center text-gray-600 text-sm max-w-xs mx-auto">
                           {incubatee.details || "N/A"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-center text-gray-800">
+                          {incubatee.sector || "N/A"}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 whitespace-nowrap">
+                        <div className="text-center text-gray-800">
+                          {incubatee.registeredWithBiharStartup ? "Yes" : "No"}
                         </div>
                       </td>
                       <td className="px-4 py-4">
@@ -177,100 +193,6 @@ const Incubatees = () => {
             </motion.div>
           )}
         </motion.div>
-
-        {/* Responsive Cards for Mobile */}
-        {/* <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="mt-8 md:hidden"
-        >
-          {incubateesData.length > 0 ? (
-            <div className="space-y-4">
-              {incubateesData.map((incubatee) => (
-                <motion.div
-                  key={incubatee.id}
-                  variants={itemVariants}
-                  className="bg-white p-4 rounded-lg shadow-md border border-orange-100"
-                >
-                  <div className="text-center mb-3">
-                    <h3 className="font-bold text-lg text-gray-900">
-                      {incubatee.startupName || "N/A"}
-                    </h3>
-                    <p className="text-orange-500">
-                      {incubatee.founderName || "N/A"}
-                      {incubatee.coFounderName &&
-                        `, ${incubatee.coFounderName}`}
-                    </p>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-4 text-center">
-                    {incubatee.details || "N/A"}
-                  </p>
-                  <div className="flex justify-center space-x-4">
-                    {incubatee.website ? (
-                      <a
-                        href={incubatee.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-500 hover:text-orange-600"
-                        aria-label="Website"
-                      >
-                        <FaGlobe className="h-5 w-5" />
-                      </a>
-                    ) : null}
-                    {incubatee.instagram ? (
-                      <a
-                        href={incubatee.instagram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-500 hover:text-orange-600"
-                        aria-label="Instagram"
-                      >
-                        <FaInstagram className="h-5 w-5" />
-                      </a>
-                    ) : null}
-                    {incubatee.twitter ? (
-                      <a
-                        href={incubatee.twitter}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-500 hover:text-orange-600"
-                        aria-label="Twitter"
-                      >
-                        <FaTwitter className="h-5 w-5" />
-                      </a>
-                    ) : null}
-                    {incubatee.linkedin ? (
-                      <a
-                        href={incubatee.linkedin}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-orange-500 hover:text-orange-600"
-                        aria-label="LinkedIn"
-                      >
-                        <FaLinkedin className="h-5 w-5" />
-                      </a>
-                    ) : null}
-                    {!incubatee.website &&
-                      !incubatee.instagram &&
-                      !incubatee.twitter &&
-                      !incubatee.linkedin && (
-                        <span className="text-gray-400">N/A</span>
-                      )}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <motion.div
-              variants={itemVariants}
-              className="text-center py-12 text-gray-600"
-            >
-              No incubatees to display currently
-            </motion.div>
-          )}
-        </motion.div> */}
       </div>
     </section>
   );
