@@ -98,7 +98,7 @@ const Incubatees = () => {
                           {incubatee.startupName || "N/A"}
                         </div>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-4 py-4 whitespace-nowrap">
                         <div className="text-center text-gray-800">
                           {incubatee.founderName || "N/A"}
                           {incubatee.coFounderName && (
