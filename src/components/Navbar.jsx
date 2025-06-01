@@ -69,6 +69,7 @@ const Navbar = () => {
                 <img
                   src={miitieLogo}
                   alt="MIITIE Logo"
+                  loading="lazy"
                   className="h-12 object-contain rounded-lg border-2 border-orange-300 p-0.5"
                 />
               </motion.div>

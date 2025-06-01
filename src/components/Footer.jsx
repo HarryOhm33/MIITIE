@@ -98,6 +98,7 @@ const Footer = () => {
               <img
                 src={miitieLogo}
                 alt="MIITIE Logo"
+                loading="lazy"
                 className="h-12 object-contain rounded-lg border-2 border-orange-300 p-0.5 mr-2"
               />
               <h3 className="text-xl font-bold text-orange-400">
