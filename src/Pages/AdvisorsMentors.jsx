@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { FaBriefcase, FaLinkedin, FaUserTie } from "react-icons/fa";
+import { FaBriefcase, FaLinkedin, FaUserTie, FaFacebook } from "react-icons/fa";
 import { advisors } from "../assets/mentor"; // Adjust the path as necessary
 import { Link } from "react-router-dom";
 
@@ -39,9 +39,6 @@ const AdvisorsMentors = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          {/* <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Our <span className="text-orange-500">Advisors & Mentors</span>
-          </h2> */}
           <motion.h2
             className="text-4xl font-bold text-gray-800 mb-3"
             initial={{ opacity: 0 }}
@@ -71,7 +68,7 @@ const AdvisorsMentors = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8"
+          className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
         >
           {advisors.map((advisor) => {
             const [imgError, setImgError] = useState(false); // move inside map
@@ -109,12 +106,16 @@ const AdvisorsMentors = () => {
                     <span>{advisor.designation}</span>
                   </div>
                   <a
-                    href={advisor.linkedin}
+                    href={advisor.social}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center w-10 h-10 mx-auto bg-gray-100 rounded-full hover:bg-orange-100 transition-colors group"
                   >
-                    <FaLinkedin className="text-gray-700 group-hover:text-orange-500 transition-colors" />
+                    {advisor.social.includes("linkedin") ? (
+                      <FaLinkedin className="text-gray-700 group-hover:text-orange-500 transition-colors" />
+                    ) : advisor.social.includes("facebook") ? (
+                      <FaFacebook className="text-gray-700 group-hover:text-orange-500 transition-colors" />
+                    ) : null}
                   </a>
                 </div>
               </motion.div>

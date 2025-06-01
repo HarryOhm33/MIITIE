@@ -3,7 +3,7 @@ import ajayShukla from "./mentor-img/ajay-shukla.jpg";
 import pradeepChoudhary from "./mentor-img/pradeep-choudhary.jpg";
 import arvindJha from "./mentor-img/arvind-jha.jpg";
 import pkMishra from "./mentor-img/pk-mishra.png";
-import rakeshJha from "./mentor-img/rakesh-jha.jpg"; // Add the image to your assets and adjust the path
+import rakeshJha from "./mentor-img/rakesh-jha.jpg";
 
 const advisors = [
   {
@@ -11,7 +11,7 @@ const advisors = [
     name: "Sri Naveen Jha",
     role: "Chief Advisor",
     designation: "Sr. ALI Fellow, Harvard University",
-    linkedin: "https://www.linkedin.com/in/naveenforchange/",
+    social: "https://www.linkedin.com/in/naveenforchange/",
     image: naveenJha,
   },
   {
@@ -19,7 +19,7 @@ const advisors = [
     name: "Prof. P.K. Mishra",
     role: "Advisor",
     designation: "Professor (HAG), IIT BHU",
-    linkedin: "https://www.linkedin.com/in/pradeep-kumar-mishra-3399243/",
+    social: "https://www.linkedin.com/in/pradeep-kumar-mishra-3399243/",
     image: pkMishra,
   },
   {
@@ -27,7 +27,7 @@ const advisors = [
     name: "Sri Arvind Jha",
     role: "Advisor",
     designation: "Founder, Mithila Angel Network",
-    linkedin: "https://www.linkedin.com/in/jalajboy/",
+    social: "https://www.linkedin.com/in/jalajboy/",
     image: arvindJha,
   },
   {
@@ -35,7 +35,7 @@ const advisors = [
     name: "Sri Pradeep Kant Choudhary",
     role: "Advisor",
     designation: "Chairman, ANADI Foundation",
-    linkedin: "https://www.linkedin.com/in/pradeep-kant-choudhary-0b825922b/",
+    social: "https://www.linkedin.com/in/pradeep-kant-choudhary-0b825922b/",
     image: pradeepChoudhary,
   },
   {
@@ -43,7 +43,7 @@ const advisors = [
     name: "Sri Ajay Suman Shukla",
     role: "Advisor",
     designation: "Sr. Vice President, Spice Money",
-    linkedin: "https://www.linkedin.com/in/ajay-suman-shukla-69534312/",
+    social: "https://www.linkedin.com/in/ajay-suman-shukla-69534312/",
     image: ajayShukla,
   },
   {
@@ -51,7 +51,7 @@ const advisors = [
     name: "Sri Rakesh K Jha",
     role: "Advisor",
     designation: "Founder, Craftvala",
-    linkedin: "https://www.linkedin.com/in/rakeshkumarjha/", // Use the correct link if different
+    social: "https://www.facebook.com/craftvala.artroom/",
     image: rakeshJha,
   },
 ];
