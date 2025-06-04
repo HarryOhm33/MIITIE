@@ -93,7 +93,7 @@ const Incubatees = () => {
                       variants={itemVariants}
                       className="hover:bg-orange-50 transition-colors"
                     >
-                      <td className="px-4 py-4 whitespace-nowrap">
+                      <td className="px-4 py-4">
                         <div className="text-center font-medium text-gray-900">
                           {incubatee.startupName || "N/A"}
                         </div>

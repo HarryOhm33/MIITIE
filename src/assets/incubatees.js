@@ -91,4 +91,17 @@ export const incubateesData = [
     twitter: "https://twitter.com/drjyoti_clinic",
     linkedin: "https://www.linkedin.com/in/dr-jyoti-7a8862154",
   },
+  {
+    id: 8,
+    startupName: "TIRHUTWALA INNOVATIONS PVT LTD",
+    founderName: "Abhinav Jha",
+    coFounderName: "Tannu Jha",
+    details: "Delivers premium makhana and authentic Bihari flavors.",
+    sector: "Agri-tech",
+    registeredWithBiharStartup: true,
+    website: "https://www.TirhutWala.com",
+    instagram: "https://instagram.com/TirhutWala",
+    twitter: "https://x.com/TirhutWala",
+    linkedin: "https://www.linkedin.com/company/tirhutwala/",
+  },
 ];
