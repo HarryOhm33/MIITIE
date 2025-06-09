@@ -166,8 +166,8 @@ const Developer = () => {
               )}
             </button>
             <div
-              className={`transition-all duration-300 ease-in-out overflow-hidden ${
-                expandedSection === "events" ? "max-h-[2000px]" : "max-h-0"
+              className={`transition-all duration-300 ease-in-out overflow-auto ${
+                expandedSection === "events" ? "max-h-[80vh]" : "max-h-0"
               }`}
             >
               <div className="p-6 border-t border-gray-100">
