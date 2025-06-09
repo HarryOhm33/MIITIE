@@ -15,6 +15,9 @@ import Terms from "./Pages/Terms";
 import MentorForm from "./Pages/MentorForm";
 import PastEvents from "./Pages/PastEvents";
 import Incubatees from "./Pages/Incubatees";
+import Developer from "./Pages/Developer";
+import LoginDev from "./Pages/LoginDev";
+import LogoutDev from "./Pages/LogoutDev";
 
 function App() {
   return (
@@ -36,6 +39,9 @@ function App() {
             <Route path="/about" element={<About />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/terms" element={<Terms />} />
+            <Route path="/developer" element={<Developer />} />
+            <Route path="/logindev" element={<LoginDev />} />
+            <Route path="/logoutdev" element={<LogoutDev />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

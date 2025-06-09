@@ -1,15 +1,48 @@
 import { motion } from "framer-motion";
 import { FaCalendarAlt, FaMapMarkerAlt, FaRegClock } from "react-icons/fa";
-import { useEffect } from "react";
-import { events } from "../assets/events";
+import { useEffect, useState } from "react";
+import {
+  collection,
+  query,
+  getDocs,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 import { Link } from "react-router-dom";
 
 const PastEvents = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    fetchPastEvents();
   }, []);
 
-  const pastEvents = events.filter((event) => !event.isUpcoming);
+  const fetchPastEvents = async () => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const eventsRef = collection(db, "events");
+      const q = query(eventsRef, where("date", "<", today.toISOString()));
+      const querySnapshot = await getDocs(q);
+
+      const eventsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort events by date in descending order (most recent first)
+      eventsList.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setEvents(eventsList);
+    } catch (error) {
+      console.error("Error fetching past events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -51,8 +84,13 @@ const PastEvents = () => {
           />
         </motion.div>
 
-        {/* Event Cards */}
-        {pastEvents.length > 0 ? (
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          </div>
+        ) : /* Event Cards */
+        events.length > 0 ? (
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -60,7 +98,7 @@ const PastEvents = () => {
             viewport={{ once: true }}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
-            {pastEvents.map((event) => (
+            {events.map((event) => (
               <motion.div
                 key={event.id}
                 variants={cardVariants}
@@ -84,15 +122,15 @@ const PastEvents = () => {
                   <div className="flex flex-wrap gap-4 mt-4 text-xs">
                     <div className="flex items-center text-gray-600">
                       <FaCalendarAlt className="mr-2 text-orange-500" />
-                      <span>{event.date}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <FaRegClock className="mr-2 text-orange-500" />
-                      <span>{event.time}</span>
+                      <span>{new Date(event.date).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <FaMapMarkerAlt className="mr-2 text-orange-500" />
                       <span>{event.location}</span>
+                    </div>
+                    <div className="flex items-center text-gray-600">
+                      <FaMapMarkerAlt className="mr-2 text-orange-500" />
+                      <span>{event.time}</span>
                     </div>
                   </div>
                 </div>
