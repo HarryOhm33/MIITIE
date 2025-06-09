@@ -7,10 +7,17 @@ import {
   FaTimes,
 } from "react-icons/fa";
 import { useEffect, useState, useRef } from "react";
-import { events } from "../assets/events";
 import { Link } from "react-router-dom";
 import { useGesture } from "@use-gesture/react";
 import { useSpring, animated } from "@react-spring/web";
+import {
+  collection,
+  query,
+  getDocs,
+  where,
+  Timestamp,
+} from "firebase/firestore";
+import { db } from "../../firebase";
 
 const ZoomableImage = ({ src, alt, onClose }) => {
   const imgRef = useRef(null);
@@ -113,14 +120,39 @@ const ZoomableImage = ({ src, alt, onClose }) => {
 };
 
 const Events = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [fullscreenImage, setFullscreenImage] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    fetchEvents();
   }, []);
 
-  const upcomingEvents = events.filter((event) => event.isUpcoming);
+  const fetchEvents = async () => {
+    try {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const eventsRef = collection(db, "events");
+      const q = query(eventsRef, where("date", ">", today.toISOString()));
+      const querySnapshot = await getDocs(q);
+
+      const eventsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Sort events by date
+      eventsList.sort((a, b) => new Date(a.date) - new Date(b.date));
+      setEvents(eventsList);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openFullscreen = (image, alt) => {
     setFullscreenImage({ image, alt });
@@ -173,79 +205,79 @@ const Events = () => {
           />
         </motion.div>
 
-        {/* Event Cards */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid md:grid-cols-2 gap-8"
-        >
-          {upcomingEvents.length > 0 ? (
-            upcomingEvents.map((event) => (
-              <motion.div
-                key={event.id}
-                variants={cardVariants}
-                className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
-              >
-                <div
-                  className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
-                  onClick={() => openFullscreen(event.image, event.alt)}
+        {/* Loading State */}
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
+          </div>
+        ) : (
+          /* Event Cards */
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-2 gap-8"
+          >
+            {events.length > 0 ? (
+              events.map((event) => (
+                <motion.div
+                  key={event.id}
+                  variants={cardVariants}
+                  className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
                 >
-                  <img
-                    src={event.image}
-                    alt={event.alt}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2 text-gray-800">
-                    {event.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4">{event.description}</p>
-                  <div className="flex flex-wrap gap-4 mt-4 text-sm">
-                    <div className="flex items-center text-gray-600">
-                      <FaCalendarAlt className="mr-2 text-orange-500" />
-                      <span>{event.date}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <FaRegClock className="mr-2 text-orange-500" />
-                      <span>{event.time}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <FaMapMarkerAlt className="mr-2 text-orange-500" />
-                      <span>{event.location}</span>
-                    </div>
-                    {event.registrationRequired && (
-                      <div className="flex items-center text-orange-500 font-medium">
-                        <FaUserPlus className="mr-2" />
-                        <span>Registration Required</span>
+                  <div
+                    className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
+                    onClick={() => openFullscreen(event.image, event.alt)}
+                  >
+                    <img
+                      src={event.image}
+                      alt={event.alt}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold mb-2 text-gray-800">
+                      {event.title}
+                    </h3>
+                    <p className="text-gray-600 mb-4">{event.description}</p>
+
+                    <div className="flex flex-wrap gap-4 mb-4 text-sm">
+                      <div className="flex items-center text-gray-600">
+                        <FaCalendarAlt className="mr-2 text-orange-500" />
+                        <span>{new Date(event.date).toLocaleDateString()}</span>
                       </div>
+                      <div className="flex items-center text-gray-600">
+                        <FaMapMarkerAlt className="mr-2 text-orange-500" />
+                        <span>{event.location}</span>
+                      </div>
+                      <div className="flex items-center text-gray-600">
+                        <FaMapMarkerAlt className="mr-2 text-orange-500" />
+                        <span>{event.time}</span>
+                      </div>
+                    </div>
+
+                    {event.registrationRequired && (
+                      <a
+                        href={event.registrationLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
+                      >
+                        <FaUserPlus className="mr-2" />
+                        Register Now
+                      </a>
                     )}
                   </div>
-                  {event.registrationRequired ? (
-                    <a
-                      href={event.registrationLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-6 px-6 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors"
-                    >
-                      Register Now
-                    </a>
-                  ) : (
-                    <div className="mt-6 px-6 py-2 bg-gray-100 text-gray-600 rounded-md">
-                      Open to all
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            ))
-          ) : (
-            <div className="text-center py-12 col-span-2">
-              <p className="text-gray-600">No upcoming events scheduled</p>
-            </div>
-          )}
-        </motion.div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="text-center py-12 col-span-2">
+                <p className="text-gray-600">No upcoming events available</p>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* View Past Events */}
         <motion.div
@@ -263,41 +295,26 @@ const Events = () => {
           </Link>
         </motion.div>
 
-        {/* Fullscreen Image Viewer */}
+        {/* Fullscreen Image Modal */}
         <AnimatePresence>
           {isFullscreen && (
             <motion.div
-              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  closeFullscreen();
-                }
-              }}
-              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center"
             >
-              <motion.div
-                className="relative w-full h-full max-w-6xl max-h-[90vh]"
-                initial={{ scale: 0.95 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.95 }}
-                transition={{ duration: 0.3 }}
+              <button
+                onClick={closeFullscreen}
+                className="absolute top-4 right-4 text-white text-2xl hover:text-orange-500 transition-colors"
               >
-                <button
-                  className="absolute top-4 right-4 z-10 bg-white/90 hover:bg-white text-orange-600 p-2 rounded-full shadow-lg transition-colors"
-                  onClick={closeFullscreen}
-                  aria-label="Close fullscreen"
-                >
-                  <FaTimes className="text-xl" />
-                </button>
-                <ZoomableImage
-                  src={fullscreenImage.image}
-                  alt={fullscreenImage.alt}
-                  onClose={closeFullscreen}
-                />
-              </motion.div>
+                <FaTimes />
+              </button>
+              <ZoomableImage
+                src={fullscreenImage?.image}
+                alt={fullscreenImage?.alt}
+                onClose={closeFullscreen}
+              />
             </motion.div>
           )}
         </AnimatePresence>
