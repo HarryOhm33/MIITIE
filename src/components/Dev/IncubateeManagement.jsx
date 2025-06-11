@@ -216,7 +216,7 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
             ) : isEditing ? (
               "Update Incubatee"
             ) : (
-              "Create Event"
+              "Add Incubatee"
             )}
           </button>
         </div>
