@@ -16,6 +16,7 @@ import { FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 import EventManagement from "../components/Dev/EventManagement";
 import IncubateeManagement from "../components/Dev/IncubateeManagement";
+import { initIncubatees } from "../components/Dev/initIncubatees";
 
 const Developer = () => {
   const navigate = useNavigate();
@@ -227,6 +228,7 @@ const Developer = () => {
               <FaSignOutAlt className="mr-2" />
               Logout
             </button>
+            {/* <button onClick={initIncubatees}>Init Incubatees</button> */}
           </div>
         </div>
       </motion.header>
