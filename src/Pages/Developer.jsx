@@ -17,12 +17,14 @@ import toast from "react-hot-toast";
 import EventManagement from "../components/Dev/EventManagement";
 import IncubateeManagement from "../components/Dev/IncubateeManagement";
 import MentorManagement from "../components/Dev/MentorManagement";
+import NotificationManagement from "../components/Dev/NotificationManagement";
 // import { initIncubatees } from "../components/Dev/initIncubatees";
 const Developer = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [incubatees, setIncubatees] = useState([]);
   const [mentors, setMentors] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [activeSection, setActiveSection] = useState("");
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -46,7 +48,12 @@ const Developer = () => {
         }
 
         setUserName(user.displayName || "Developer");
-        await Promise.all([fetchEvents(), fetchIncubatees(), fetchMentors()]);
+        await Promise.all([
+          fetchEvents(),
+          fetchIncubatees(),
+          fetchMentors(),
+          fetchNotifications(),
+        ]);
       } catch (error) {
         console.error("Authentication error:", error);
         toast.error("Authentication failed");
@@ -98,6 +105,20 @@ const Developer = () => {
     } catch (error) {
       console.error("Error fetching mentors:", error);
       toast.error("Failed to load mentors");
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "notifications"));
+      const notificationsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotifications(notificationsList);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      toast.error("Failed to load notifications");
     }
   };
 
@@ -237,6 +258,53 @@ const Developer = () => {
     } catch (error) {
       console.error("Error deleting mentor:", error);
       toast.error("Failed to delete mentor");
+    }
+  };
+
+  //Notification handlers
+  const handleCreateNotification = async (notification) => {
+    try {
+      const notificationRef = doc(collection(db, "notifications"));
+      await setDoc(notificationRef, {
+        id: notificationRef.id,
+        ...notification,
+        createdAt: new Date().toISOString(),
+        createdBy: auth.currentUser?.uid || "unknown",
+      });
+      toast.success("Notification created successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      toast.error("Failed to create notification");
+      throw error;
+    }
+  };
+
+  const handleUpdateNotification = async (notification) => {
+    try {
+      await updateDoc(doc(db, "notifications", notification.id), {
+        ...notification,
+        updatedAt: new Date().toISOString(),
+      });
+      toast.success("Notification updated successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      toast.error("Failed to update notification");
+      throw error;
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId) => {
+    if (!window.confirm("Are you sure you want to delete this notification?"))
+      return;
+    try {
+      await deleteDoc(doc(db, "notifications", notificationId));
+      toast.success("Notification deleted successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("Failed to delete notification");
     }
   };
 
@@ -427,6 +495,51 @@ const Developer = () => {
                       onCreate={handleCreateMentor}
                       onUpdate={handleUpdateMentor}
                       onDelete={handleDeleteMentor}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Notification Management Section */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <button
+              onClick={() => toggleSection("notifications")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Notification Management
+                </h2>
+                <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                  {notifications.length}{" "}
+                  {notifications.length === 1
+                    ? "Notification"
+                    : "Notifications"}
+                </span>
+              </div>
+              {activeSection === "notifications" ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
+            </button>
+            <AnimatePresence>
+              {activeSection === "notifications" && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 border-t border-gray-100">
+                    <NotificationManagement
+                      notifications={notifications}
+                      onCreate={handleCreateNotification}
+                      onUpdate={handleUpdateNotification}
+                      onDelete={handleDeleteNotification}
                     />
                   </div>
                 </motion.div>

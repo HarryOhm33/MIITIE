@@ -5,7 +5,7 @@ import arvindJha from "./mentor-img/arvind-jha.jpg";
 import pkMishra from "./mentor-img/pk-mishra.png";
 import rakeshJha from "./mentor-img/rakesh-jha.jpg";
 
-const mentorsData = [
+const mentorData = [
   {
     cardPosition: 1,
     name: "Sri Naveen Jha",
@@ -42,7 +42,7 @@ const mentorsData = [
     cardPosition: 5,
     name: "Sri Ajay Suman Shukla",
     role: "Advisor",
-    designation: "Sr. Vice PrescardPositionent, Spice Money",
+    designation: "Sr. Vice President, Spice Money",
     social: "https://www.linkedin.com/in/ajay-suman-shukla-69534312/",
     image: ajayShukla,
   },
@@ -56,4 +56,4 @@ const mentorsData = [
   },
 ];
 
-export { mentorsData };
+export { advisors };
