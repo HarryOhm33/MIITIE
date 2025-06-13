@@ -7,17 +7,24 @@ export const initIncubatees = async () => {
   try {
     const uid = auth.currentUser?.uid || "unknown";
 
-    for (const incubatee of incubateesData) {
+    // Sort incubatees by `id` in ascending order
+    const sortedIncubatees = [...incubateesData].sort((a, b) => a.id - b.id);
+
+    // Upload each incubatee one by one in sorted order
+    for (const incubatee of sortedIncubatees) {
       const incubateeRef = doc(collection(db, "incubatees"));
       await setDoc(incubateeRef, {
-        id: incubateeRef.id,
         ...incubatee,
+        id: incubateeRef.id, // Firebase-generated ID
         createdAt: new Date(),
         createdBy: uid,
       });
+      setTimeout(() => {
+        console.log(`Initialized`, incubatee.startupName);
+      }, 1000);
     }
 
-    toast.success("All incubatees initialized to Firestore");
+    toast.success("All incubatees initialized to Firestore in order");
   } catch (error) {
     console.error("Error initializing incubatees:", error);
     toast.error("Failed to initialize incubatees");
