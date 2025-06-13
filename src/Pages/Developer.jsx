@@ -16,12 +16,15 @@ import { FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
 import EventManagement from "../components/Dev/EventManagement";
 import IncubateeManagement from "../components/Dev/IncubateeManagement";
-import { initIncubatees } from "../components/Dev/initIncubatees";
-
+import MentorManagement from "../components/Dev/MentorManagement";
+import NotificationManagement from "../components/Dev/NotificationManagement";
+// import { initIncubatees } from "../components/Dev/initIncubatees";
 const Developer = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [incubatees, setIncubatees] = useState([]);
+  const [mentors, setMentors] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [activeSection, setActiveSection] = useState("");
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -45,7 +48,12 @@ const Developer = () => {
         }
 
         setUserName(user.displayName || "Developer");
-        await Promise.all([fetchEvents(), fetchIncubatees()]);
+        await Promise.all([
+          fetchEvents(),
+          fetchIncubatees(),
+          fetchMentors(),
+          fetchNotifications(),
+        ]);
       } catch (error) {
         console.error("Authentication error:", error);
         toast.error("Authentication failed");
@@ -86,6 +94,35 @@ const Developer = () => {
     }
   };
 
+  const fetchMentors = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "mentors"));
+      const mentorsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setMentors(mentorsList);
+    } catch (error) {
+      console.error("Error fetching mentors:", error);
+      toast.error("Failed to load mentors");
+    }
+  };
+
+  const fetchNotifications = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "notifications"));
+      const notificationsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotifications(notificationsList);
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      toast.error("Failed to load notifications");
+    }
+  };
+
+  // Event handlers
   const handleCreateEvent = async (event) => {
     try {
       const eventRef = doc(collection(db, "events"));
@@ -121,7 +158,6 @@ const Developer = () => {
 
   const handleDeleteEvent = async (eventId) => {
     if (!window.confirm("Are you sure you want to delete this event?")) return;
-
     try {
       await deleteDoc(doc(db, "events", eventId));
       toast.success("Event deleted successfully");
@@ -132,6 +168,7 @@ const Developer = () => {
     }
   };
 
+  // Incubatee handlers
   const handleCreateIncubatee = async (incubatee) => {
     try {
       const incubateeRef = doc(collection(db, "incubatees"));
@@ -168,7 +205,6 @@ const Developer = () => {
   const handleDeleteIncubatee = async (incubateeId) => {
     if (!window.confirm("Are you sure you want to delete this incubatee?"))
       return;
-
     try {
       await deleteDoc(doc(db, "incubatees", incubateeId));
       toast.success("Incubatee deleted successfully");
@@ -176,6 +212,99 @@ const Developer = () => {
     } catch (error) {
       console.error("Error deleting incubatee:", error);
       toast.error("Failed to delete incubatee");
+    }
+  };
+
+  // Mentor handlers
+  const handleCreateMentor = async (mentor) => {
+    try {
+      const mentorRef = doc(collection(db, "mentors"));
+      await setDoc(mentorRef, {
+        id: mentorRef.id,
+        ...mentor,
+        createdAt: new Date(),
+        createdBy: auth.currentUser?.uid || "unknown",
+      });
+      toast.success("Mentor added successfully");
+      await fetchMentors();
+    } catch (error) {
+      console.error("Error creating mentor:", error);
+      toast.error("Failed to add mentor");
+      throw error;
+    }
+  };
+
+  const handleUpdateMentor = async (mentor) => {
+    try {
+      await updateDoc(doc(db, "mentors", mentor.id), {
+        ...mentor,
+        updatedAt: new Date(),
+      });
+      toast.success("Mentor updated successfully");
+      await fetchMentors();
+    } catch (error) {
+      console.error("Error updating mentor:", error);
+      toast.error("Failed to update mentor");
+      throw error;
+    }
+  };
+
+  const handleDeleteMentor = async (mentorId) => {
+    if (!window.confirm("Are you sure you want to delete this mentor?")) return;
+    try {
+      await deleteDoc(doc(db, "mentors", mentorId));
+      toast.success("Mentor deleted successfully");
+      await fetchMentors();
+    } catch (error) {
+      console.error("Error deleting mentor:", error);
+      toast.error("Failed to delete mentor");
+    }
+  };
+
+  //Notification handlers
+  const handleCreateNotification = async (notification) => {
+    try {
+      const notificationRef = doc(collection(db, "notifications"));
+      await setDoc(notificationRef, {
+        id: notificationRef.id,
+        ...notification,
+        createdAt: new Date().toISOString(),
+        createdBy: auth.currentUser?.uid || "unknown",
+      });
+      toast.success("Notification created successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error creating notification:", error);
+      toast.error("Failed to create notification");
+      throw error;
+    }
+  };
+
+  const handleUpdateNotification = async (notification) => {
+    try {
+      await updateDoc(doc(db, "notifications", notification.id), {
+        ...notification,
+        updatedAt: new Date().toISOString(),
+      });
+      toast.success("Notification updated successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error updating notification:", error);
+      toast.error("Failed to update notification");
+      throw error;
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId) => {
+    if (!window.confirm("Are you sure you want to delete this notification?"))
+      return;
+    try {
+      await deleteDoc(doc(db, "notifications", notificationId));
+      toast.success("Notification deleted successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("Failed to delete notification");
     }
   };
 
@@ -228,7 +357,12 @@ const Developer = () => {
               <FaSignOutAlt className="mr-2" />
               Logout
             </button>
-            {/* <button onClick={initIncubatees}>Init Incubatees</button> */}
+            {/* <button
+              onClick={initIncubatees}
+              className="flex items-center px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
+            >
+              Init
+            </button> */}
           </div>
         </div>
       </motion.header>
@@ -319,6 +453,93 @@ const Developer = () => {
                       onCreate={handleCreateIncubatee}
                       onUpdate={handleUpdateIncubatee}
                       onDelete={handleDeleteIncubatee}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Mentor Management Section */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <button
+              onClick={() => toggleSection("mentors")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Mentor Management
+                </h2>
+                <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                  {mentors.length} {mentors.length === 1 ? "Mentor" : "Mentors"}
+                </span>
+              </div>
+              {activeSection === "mentors" ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
+            </button>
+            <AnimatePresence>
+              {activeSection === "mentors" && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 border-t border-gray-100">
+                    <MentorManagement
+                      mentors={mentors}
+                      onCreate={handleCreateMentor}
+                      onUpdate={handleUpdateMentor}
+                      onDelete={handleDeleteMentor}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Notification Management Section */}
+          <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+            <button
+              onClick={() => toggleSection("notifications")}
+              className="w-full px-6 py-4 flex justify-between items-center hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center space-x-3">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Notification Management
+                </h2>
+                <span className="px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                  {notifications.length}{" "}
+                  {notifications.length === 1
+                    ? "Notification"
+                    : "Notifications"}
+                </span>
+              </div>
+              {activeSection === "notifications" ? (
+                <FaChevronUp className="text-gray-500" />
+              ) : (
+                <FaChevronDown className="text-gray-500" />
+              )}
+            </button>
+            <AnimatePresence>
+              {activeSection === "notifications" && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-6 border-t border-gray-100">
+                    <NotificationManagement
+                      notifications={notifications}
+                      onCreate={handleCreateNotification}
+                      onUpdate={handleUpdateNotification}
+                      onDelete={handleDeleteNotification}
                     />
                   </div>
                 </motion.div>

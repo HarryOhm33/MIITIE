@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FaInstagram, FaTwitter, FaLinkedin, FaGlobe } from "react-icons/fa";
-import { incubateesData } from "../assets/incubatees";
 import {
   collection,
   query,

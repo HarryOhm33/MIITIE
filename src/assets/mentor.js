@@ -5,9 +5,9 @@ import arvindJha from "./mentor-img/arvind-jha.jpg";
 import pkMishra from "./mentor-img/pk-mishra.png";
 import rakeshJha from "./mentor-img/rakesh-jha.jpg";
 
-const advisors = [
+const mentorData = [
   {
-    id: 1,
+    cardPosition: 1,
     name: "Sri Naveen Jha",
     role: "Chief Advisor",
     designation: "Sr. ALI Fellow, Harvard University",
@@ -15,7 +15,7 @@ const advisors = [
     image: naveenJha,
   },
   {
-    id: 2,
+    cardPosition: 2,
     name: "Prof. P.K. Mishra",
     role: "Advisor",
     designation: "Professor (HAG), IIT BHU",
@@ -23,7 +23,7 @@ const advisors = [
     image: pkMishra,
   },
   {
-    id: 3,
+    cardPosition: 3,
     name: "Sri Arvind Jha",
     role: "Advisor",
     designation: "Founder, Mithila Angel Network",
@@ -31,7 +31,7 @@ const advisors = [
     image: arvindJha,
   },
   {
-    id: 4,
+    cardPosition: 4,
     name: "Sri Pradeep Kant Choudhary",
     role: "Advisor",
     designation: "Chairman, ANADI Foundation",
@@ -39,7 +39,7 @@ const advisors = [
     image: pradeepChoudhary,
   },
   {
-    id: 5,
+    cardPosition: 5,
     name: "Sri Ajay Suman Shukla",
     role: "Advisor",
     designation: "Sr. Vice President, Spice Money",
@@ -47,7 +47,7 @@ const advisors = [
     image: ajayShukla,
   },
   {
-    id: 6,
+    cardPosition: 6,
     name: "Sri Rakesh K Jha",
     role: "Advisor",
     designation: "Founder, Craftvala",
