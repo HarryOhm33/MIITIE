@@ -340,26 +340,23 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
 };
 
 const MentorCard = ({ mentor, onEdit, onDelete }) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
+  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col items-center text-center">
     {mentor.image && (
-      <div className="relative h-48 overflow-hidden">
+      <div className="relative w-32 h-32 mt-6 mb-4">
         <img
           src={mentor.image}
           alt={mentor.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-full border-4 border-orange-300 shadow"
         />
       </div>
     )}
-    <div className="p-4 flex-grow">
-      <h2 className="text-xl font-bold text-gray-800 mb-2">{mentor.name}</h2>
-      <div className="text-sm text-gray-600 mb-1">
-        <span className="font-medium">Role:</span> {mentor.role}
-      </div>
-      <div className="text-sm text-gray-600 mb-3">
-        <span className="font-medium">Designation:</span> {mentor.designation}
-      </div>
+    <div className="px-4 pb-4 flex-grow w-full">
+      <h2 className="text-xl font-bold text-gray-800 mb-1">{mentor.name}</h2>
+      <p className="text-orange-500 font-medium mb-1">{mentor.role}</p>
+      <p className="text-gray-600 text-sm mb-2">{mentor.designation}</p>
+
       {mentor.social && (
-        <div className="mb-3">
+        <div className="mb-2">
           <a
             href={mentor.social}
             target="_blank"
@@ -370,11 +367,11 @@ const MentorCard = ({ mentor, onEdit, onDelete }) => (
           </a>
         </div>
       )}
-      <div className="text-xs text-gray-500 mt-2">
+      <div className="text-xs text-gray-500">
         Card Position: {mentor.cardPosition || 0}
       </div>
     </div>
-    <div className="p-4 border-t border-gray-100 flex justify-end space-x-2">
+    <div className="p-3 border-t border-gray-100 w-full flex justify-center space-x-4">
       <button
         onClick={() => onEdit(mentor)}
         className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
