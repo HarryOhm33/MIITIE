@@ -132,21 +132,24 @@ const Events = () => {
 
   const fetchEvents = async () => {
     try {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const now = new Date();
 
       const eventsRef = collection(db, "events");
-      const q = query(eventsRef, where("date", ">", today.toISOString()));
-      const querySnapshot = await getDocs(q);
+      const querySnapshot = await getDocs(eventsRef);
 
-      const eventsList = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const filteredEvents = querySnapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .filter((event) => {
+          const start = new Date(event.date);
+          const end = new Date(start.getTime() + 18 * 60 * 60 * 1000); // 10 hours later
+          return end >= now; // still ongoing or upcoming
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date)); // sort by start
 
-      // Sort events by date
-      eventsList.sort((a, b) => new Date(a.date) - new Date(b.date));
-      setEvents(eventsList);
+      setEvents(filteredEvents);
     } catch (error) {
       console.error("Error fetching events:", error);
     } finally {
