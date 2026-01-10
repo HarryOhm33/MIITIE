@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { useInView } from "react-intersection-observer";
 import ankitKumar from "../assets/faculty-img/ankit-kumar.jpg";
 import suryaPrakash from "../assets/faculty-img/surya-prakash.jpeg";
-import sandeepTiwari from "../assets/faculty-img/sandeep-tiwari.jpeg"; // Update path if different
+import chandanKumar from "../assets/faculty-img/chandan-kumar.jpeg"; // Update path if different
 
 const About = () => {
   useEffect(() => {
@@ -48,11 +48,11 @@ const About = () => {
   const facultyMembers = [
     {
       id: 1,
-      name: "Prof. (Dr.) Sandeep Tiwari",
+      name: "Prof. (Dr.) Chandan Kumar",
       designation: "Principal, DCE Darbhanga",
-      mobile: "+91-9891460727",
+      mobile: "+91-8506949851",
       email: "dcedbg@rediffmail.com",
-      image: sandeepTiwari,
+      image: chandanKumar,
     },
     {
       id: 2,
