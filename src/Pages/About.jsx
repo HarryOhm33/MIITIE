@@ -11,6 +11,7 @@ import { useInView } from "react-intersection-observer";
 import ankitKumar from "../assets/faculty-img/ankit-kumar.jpg";
 import suryaPrakash from "../assets/faculty-img/surya-prakash.jpeg";
 import chandanKumar from "../assets/faculty-img/chandan-kumar.jpeg"; // Update path if different
+import aboutImg from "../assets/about.jpg";
 
 const About = () => {
   useEffect(() => {
@@ -178,7 +179,7 @@ const About = () => {
             >
               <div className="bg-orange-100 rounded-xl overflow-hidden aspect-square max-w-md mx-auto">
                 <img
-                  src="https://www.dce-darbhanga.org/wp-content/uploads/2024/08/mo.jpg"
+                  src={aboutImg}
                   alt="MIITIE Incubation Center"
                   className="w-full h-full object-cover"
                 />
