@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { FaArrowLeft, FaShieldAlt } from "react-icons/fa";
-import miitieLogo from "../../assets/miitie-logo.jpg";
+import miitieLogoMini from "../../assets/miitie-logo-mini.jpg";
 
 const LoginAdmin = () => {
   const navigate = useNavigate();
@@ -97,9 +97,9 @@ const LoginAdmin = () => {
               className="mb-4"
             >
               <img
-                src={miitieLogo}
+                src={miitieLogoMini}
                 alt="MIITIE Logo"
-                className="h-20 w-20 object-contain rounded-2xl border-2 border-orange-300 p-1 bg-white shadow-md"
+                className="h-12 w-12 object-contain rounded-xl border border-orange-300 p-0.5 bg-white shadow-sm"
               />
             </motion.div>
             

@@ -2,12 +2,17 @@ import { useState } from "react";
 import { FaEdit, FaTrash, FaImage, FaTimes } from "react-icons/fa";
 import { uploadImage } from "../../utils/cloudinary";
 import toast from "react-hot-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
   const [editingMentor, setEditingMentor] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+
   const [mentorData, setMentorData] = useState({
     name: "",
     role: "",
@@ -99,11 +104,7 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
       cardPosition: mentor.cardPosition || 0,
     });
     setImagePreview(mentor.image || null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleDelete = async (mentor) => {
-    await onDelete(mentor.id);
+    setIsModalOpen(true);
   };
 
   const resetForm = () => {
@@ -118,210 +119,288 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
     setSelectedImage(null);
     setImagePreview(null);
     setEditingMentor(null);
+    setIsModalOpen(false);
   };
 
+  const filteredMentors = mentors.filter((mentor) => {
+    const matchesQuery =
+      !searchQuery ||
+      mentor.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      mentor.designation?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesRole =
+      !filterRole ||
+      mentor.role?.toLowerCase().includes(filterRole.toLowerCase());
+    return matchesQuery && matchesRole;
+  });
+
   return (
-    <div className="space-y-8">
-      {/* Mentor Form */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">
-          {editingMentor ? "Edit Mentor" : "Add New Mentor"}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name *
-              </label>
-              <input
-                type="text"
-                placeholder="Mentor name"
-                value={mentorData.name}
-                onChange={(e) =>
-                  setMentorData({ ...mentorData, name: e.target.value })
-                }
-                className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Role *
-              </label>
-              <input
-                type="text"
-                placeholder="Mentor role"
-                value={mentorData.role}
-                onChange={(e) =>
-                  setMentorData({ ...mentorData, role: e.target.value })
-                }
-                className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Designation *
-            </label>
-            <input
-              type="text"
-              placeholder="Mentor designation"
-              value={mentorData.designation}
-              onChange={(e) =>
-                setMentorData({ ...mentorData, designation: e.target.value })
-              }
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Social Link
-            </label>
-            <input
-              type="url"
-              placeholder="https://example.com/profile"
-              value={mentorData.social}
-              onChange={(e) =>
-                setMentorData({ ...mentorData, social: e.target.value })
-              }
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Card Position
-            </label>
-            <input
-              type="number"
-              placeholder="Position in list (0 for default)"
-              value={mentorData.cardPosition}
-              onChange={(e) =>
-                setMentorData({ ...mentorData, cardPosition: e.target.value })
-              }
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500"
-              min="0"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">
-              Profile Image
-            </label>
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-4">
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="flex items-center justify-center px-4 py-2 bg-gray-100 rounded-md cursor-pointer hover:bg-gray-200 w-full md:w-auto"
-                  >
-                    <FaImage className="mr-2" />
-                    {selectedImage ? "Change Image" : "Choose Image"}
-                  </label>
-                </div>
-              </div>
-
-              {(imagePreview || mentorData.image) && (
-                <div className="relative mt-2">
-                  <img
-                    src={imagePreview || mentorData.image}
-                    alt="Mentor preview"
-                    className="h-48 w-full object-contain rounded-md border"
-                  />
-                  <button
-                    type="button"
-                    onClick={removeImage}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                    title="Remove image"
-                  >
-                    <FaTimes size={14} />
-                  </button>
-                </div>
-              )}
-            </div>
-            <p className="text-xs text-gray-500">
-              Maximum file size: 5MB. Supported formats: JPG, PNG, GIF.
-            </p>
-          </div>
-
-          <div className="flex justify-end space-x-4 pt-4">
-            {editingMentor && (
-              <button
-                type="button"
-                onClick={resetForm}
-                className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-            )}
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-blue-400 flex items-center justify-center min-w-32"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <span className="flex items-center">
-                  <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Processing...
-                </span>
-              ) : editingMentor ? (
-                "Update Mentor"
-              ) : (
-                "Add Mentor"
-              )}
-            </button>
-          </div>
-        </form>
+    <div className="space-y-6">
+      {/* Header section with Create Button */}
+      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-800">Manage Mentors ({mentors.length})</h3>
+        <button
+          onClick={() => {
+            resetForm();
+            setIsModalOpen(true);
+          }}
+          className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0"
+        >
+          Add New Mentor
+        </button>
       </div>
 
-      {/* Mentors List */}
-      {mentors.length > 0 ? (
+      {/* Advanced Search & Filters */}
+      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search mentors by name or designation..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+          />
+        </div>
+        <div className="w-full sm:w-48 shrink-0">
+          <input
+            type="text"
+            placeholder="Filter by role..."
+            value={filterRole}
+            onChange={(e) => setFilterRole(e.target.value)}
+            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+          />
+        </div>
+        {(searchQuery || filterRole) && (
+          <button
+            onClick={() => {
+              setSearchQuery("");
+              setFilterRole("");
+            }}
+            className="px-4 py-2.5 text-xs text-orange-500 hover:text-orange-600 font-bold border-0 bg-transparent cursor-pointer"
+          >
+            Clear Filters
+          </button>
+        )}
+      </div>
+
+      {/* Modal form container */}
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={resetForm}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden relative z-10 max-h-[90vh] flex flex-col"
+            >
+              {/* Header */}
+              <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h2 className="text-lg font-bold text-slate-800">
+                  {editingMentor ? "Edit Mentor Details" : "Add New Mentor"}
+                </h2>
+                <button onClick={resetForm} className="text-slate-400 hover:text-slate-650 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
+                  <FaTimes className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Form body */}
+              <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                      Name *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Mentor name"
+                      value={mentorData.name}
+                      onChange={(e) =>
+                        setMentorData({ ...mentorData, name: e.target.value })
+                      }
+                      className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                      Role *
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Mentor role (e.g. Advisor, Consultant)"
+                      value={mentorData.role}
+                      onChange={(e) =>
+                        setMentorData({ ...mentorData, role: e.target.value })
+                      }
+                      className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                    Designation *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Mentor designation (e.g. Professor at IIT, VP at Company)"
+                    value={mentorData.designation}
+                    onChange={(e) =>
+                      setMentorData({ ...mentorData, designation: e.target.value })
+                    }
+                    className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                      Social Link
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://linkedin.com/in/username"
+                      value={mentorData.social}
+                      onChange={(e) =>
+                        setMentorData({ ...mentorData, social: e.target.value })
+                      }
+                      className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                      Card Position
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="Position (e.g. 1, 2, 3)"
+                      value={mentorData.cardPosition}
+                      onChange={(e) =>
+                        setMentorData({ ...mentorData, cardPosition: e.target.value })
+                      }
+                      className="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+                      min="0"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-500 uppercase mb-1">
+                    Profile Image
+                  </label>
+                  <div className="mt-1 flex items-center space-x-4">
+                    <label className="flex items-center justify-center px-4 py-2.5 bg-white border border-slate-200 rounded-xl shadow-sm cursor-pointer hover:bg-slate-50 focus-within:ring-2 focus-within:ring-orange-400">
+                      <FaImage className="w-5 h-5 text-slate-400 mr-2" />
+                      <span className="text-sm font-semibold text-slate-700">Choose Image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    {imagePreview && (
+                      <div className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200 shadow-inner bg-slate-50">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors border-0 cursor-pointer"
+                          title="Remove image"
+                        >
+                          <FaTimes size={10} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-2">
+                    Maximum file size: 5MB. Supported formats: JPG, PNG, GIF.
+                  </p>
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={resetForm}
+                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-705 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-350 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Saving...
+                      </span>
+                    ) : editingMentor ? (
+                      "Update"
+                    ) : (
+                      "Add"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Mentors List Grid */}
+      {filteredMentors.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mentors
+          {filteredMentors
             .sort((a, b) => (a.cardPosition || 0) - (b.cardPosition || 0))
             .map((mentor) => (
               <MentorCard
                 key={mentor.id}
                 mentor={mentor}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={onDelete}
               />
             ))}
         </div>
       ) : (
-        <div className="text-center py-8 text-gray-500">
-          No mentors found. Add your first mentor above.
+        <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500 shadow-sm">
+          No mentors found. Click "Add New Mentor" to add one.
         </div>
       )}
     </div>
@@ -329,51 +408,59 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
 };
 
 const MentorCard = ({ mentor, onEdit, onDelete }) => (
-  <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col items-center text-center">
-    {mentor.image && (
-      <div className="relative w-32 h-32 mt-6 mb-4">
+  <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col items-center text-center p-6 relative">
+    {mentor.image ? (
+      <div className="relative w-28 h-28 mb-4 shrink-0 shadow-md rounded-full border-4 border-orange-100/60 overflow-hidden bg-slate-50">
         <img
           src={mentor.image}
           alt={mentor.name}
-          className="w-full h-full object-cover rounded-full border-4 border-orange-300 shadow"
+          className="w-full h-full object-cover"
         />
       </div>
+    ) : (
+      <div className="w-28 h-28 mb-4 shrink-0 rounded-full border-4 border-orange-100/60 bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-2xl uppercase">
+        {mentor.name?.substring(0, 2) || "M"}
+      </div>
     )}
-    <div className="px-4 pb-4 flex-grow w-full">
-      <h2 className="text-xl font-bold text-gray-800 mb-1">{mentor.name}</h2>
-      <p className="text-orange-500 font-medium mb-1">{mentor.role}</p>
-      <p className="text-gray-600 text-sm mb-2">{mentor.designation}</p>
+    
+    <div className="flex-grow w-full">
+      <h4 className="text-base font-bold text-slate-800 tracking-tight leading-snug">{mentor.name}</h4>
+      <p className="text-xs font-semibold text-orange-500 mt-1 uppercase tracking-wider">{mentor.role}</p>
+      <p className="text-slate-500 text-xs mt-2 leading-relaxed min-h-[36px] line-clamp-2">{mentor.designation}</p>
 
       {mentor.social && (
-        <div className="mb-2">
+        <div className="mt-4">
           <a
             href={mentor.social}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="inline-flex items-center text-xs font-bold text-blue-600 hover:text-blue-700 gap-1 hover:underline"
           >
-            Social Profile
+            <span>LinkedIn Profile</span>
+            <span>↗</span>
           </a>
         </div>
       )}
-      <div className="text-xs text-gray-500">
-        Card Position: {mentor.cardPosition || 0}
+      
+      <div className="mt-3 text-[10px] text-slate-400 font-medium bg-slate-50 inline-block px-2.5 py-1 rounded-full">
+        Position Order: {mentor.cardPosition || 0}
       </div>
     </div>
-    <div className="p-3 border-t border-gray-100 w-full flex justify-center space-x-4">
+
+    <div className="mt-6 pt-4 border-t border-slate-50 w-full flex justify-end gap-2">
       <button
         onClick={() => onEdit(mentor)}
-        className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+        className="p-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
         title="Edit"
       >
-        <FaEdit />
+        <FaEdit className="w-4 h-4" />
       </button>
       <button
         onClick={() => onDelete(mentor)}
-        className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+        className="p-2 text-red-655 hover:bg-red-50 hover:text-red-755 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
         title="Delete"
       >
-        <FaTrash />
+        <FaTrash className="w-4 h-4" />
       </button>
     </div>
   </div>

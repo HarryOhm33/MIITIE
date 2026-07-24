@@ -20,7 +20,7 @@ const Footer = () => {
     { name: "Mentors", path: "/mentors" },
     { name: "Incubatees", path: "/incubatees" },
     { name: "Facilities", path: "/facilities" },
-    // { name: "Contact", path: "/contact" }, // Added missing contact link
+    { name: "Admin Dashboard", path: "/admin" },
   ];
 
   const contactInfo = [
