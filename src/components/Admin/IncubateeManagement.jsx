@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
-import toast from "react-hot-toast";
 
 const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -41,10 +40,7 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
       }
       resetForm();
     } catch (error) {
-      console.log(error);
-      toast.error(
-        isEditing ? "Failed to update incubatee" : "Failed to create incubatee"
-      );
+      console.error("Error saving incubatee:", error);
     } finally {
       setIsSubmitting(false);
     }

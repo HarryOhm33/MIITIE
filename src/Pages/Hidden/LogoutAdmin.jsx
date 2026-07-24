@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth } from "../../firebase";
+import { auth } from "../../../firebase";
 import { signOut } from "firebase/auth";
 import toast from "react-hot-toast";
 
-const LogoutDev = () => {
+const LogoutAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,10 +12,10 @@ const LogoutDev = () => {
       try {
         await signOut(auth);
         toast.success("Logged out successfully");
-        navigate("/logindev");
-      } catch (error) {
+        navigate("/loginadmin");
+      } catch {
         toast.error("Logout failed");
-        navigate("/developer");
+        navigate("/admin");
       }
     };
 
@@ -25,4 +25,4 @@ const LogoutDev = () => {
   return null;
 };
 
-export default LogoutDev;
+export default LogoutAdmin;

@@ -37,16 +37,13 @@ const NotificationManagement = ({
 
       if (editingNotification) {
         await onUpdate({ ...editingNotification, ...notification });
-        toast.success("Notification updated successfully");
       } else {
         await onCreate(notification);
-        toast.success("Notification created successfully");
       }
 
       resetForm();
     } catch (error) {
       console.error("Error saving notification:", error);
-      toast.error(error.message || "Failed to save notification");
     } finally {
       setIsSubmitting(false);
     }
@@ -63,16 +60,7 @@ const NotificationManagement = ({
   };
 
   const handleDelete = async (notification) => {
-    if (!window.confirm("Are you sure you want to delete this notification?"))
-      return;
-
-    try {
-      await onDelete(notification.id);
-      toast.success("Notification deleted successfully");
-    } catch (error) {
-      console.error("Error deleting notification:", error);
-      toast.error("Failed to delete notification");
-    }
+    await onDelete(notification.id);
   };
 
   const resetForm = () => {

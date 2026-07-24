@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { auth, db } from "../../firebase";
+import { auth, db } from "../../../firebase";
 import {
   collection,
   doc,
@@ -14,12 +14,12 @@ import {
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FaChevronDown, FaChevronUp, FaSignOutAlt } from "react-icons/fa";
 import toast from "react-hot-toast";
-import EventManagement from "../components/Dev/EventManagement";
-import IncubateeManagement from "../components/Dev/IncubateeManagement";
-import MentorManagement from "../components/Dev/MentorManagement";
-import NotificationManagement from "../components/Dev/NotificationManagement";
-// import { initIncubatees } from "../components/Dev/initIncubatees";
-const Developer = () => {
+import EventManagement from "../../components/Admin/EventManagement";
+import IncubateeManagement from "../../components/Admin/IncubateeManagement";
+import MentorManagement from "../../components/Admin/MentorManagement";
+import NotificationManagement from "../../components/Admin/NotificationManagement";
+// import { initIncubatees } from "../../components/Admin/initIncubatees";
+const Admin = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [incubatees, setIncubatees] = useState([]);
@@ -29,10 +29,23 @@ const Developer = () => {
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  const sortByDateDescending = (items, field) =>
+    [...items].sort((a, b) => {
+      const getTimestamp = (value) => {
+        if (!value) return 0;
+        if (typeof value.toDate === "function") return value.toDate().getTime();
+
+        const timestamp = new Date(value).getTime();
+        return Number.isNaN(timestamp) ? 0 : timestamp;
+      };
+
+      return getTimestamp(b[field]) - getTimestamp(a[field]);
+    });
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        navigate("/logindev");
+        navigate("/loginadmin");
         return;
       }
 
@@ -40,14 +53,14 @@ const Developer = () => {
         const userRef = doc(db, "users", user.uid);
         const userSnap = await getDoc(userRef);
 
-        if (!userSnap.exists() || !userSnap.data().isDeveloper) {
+        if (!userSnap.exists() || userSnap.data().isAdmin !== true) {
           await signOut(auth);
           toast.error("Insufficient permissions. Logged out.");
-          navigate("/logindev");
+          navigate("/loginadmin");
           return;
         }
 
-        setUserName(user.displayName || "Developer");
+        setUserName(user.displayName || "Admin");
         await Promise.all([
           fetchEvents(),
           fetchIncubatees(),
@@ -57,7 +70,7 @@ const Developer = () => {
       } catch (error) {
         console.error("Authentication error:", error);
         toast.error("Authentication failed");
-        navigate("/logindev");
+        navigate("/loginadmin");
       } finally {
         setIsLoading(false);
       }
@@ -73,7 +86,7 @@ const Developer = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setEvents(eventsList);
+      setEvents(sortByDateDescending(eventsList, "date"));
     } catch (error) {
       console.error("Error fetching events:", error);
       toast.error("Failed to load events");
@@ -87,7 +100,7 @@ const Developer = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setIncubatees(incubateesList);
+      setIncubatees(sortByDateDescending(incubateesList, "createdAt"));
     } catch (error) {
       console.error("Error fetching incubatees:", error);
       toast.error("Failed to load incubatees");
@@ -101,7 +114,7 @@ const Developer = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setMentors(mentorsList);
+      setMentors(sortByDateDescending(mentorsList, "createdAt"));
     } catch (error) {
       console.error("Error fetching mentors:", error);
       toast.error("Failed to load mentors");
@@ -115,7 +128,7 @@ const Developer = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      setNotifications(notificationsList);
+      setNotifications(sortByDateDescending(notificationsList, "createdAt"));
     } catch (error) {
       console.error("Error fetching notifications:", error);
       toast.error("Failed to load notifications");
@@ -311,7 +324,7 @@ const Developer = () => {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/logindev");
+      navigate("/loginadmin");
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Failed to logout");
@@ -344,7 +357,7 @@ const Developer = () => {
       >
         <div className="container mx-auto px-4 py-4 max-w-7xl flex flex-col md:flex-row justify-between items-center">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-            Developer Dashboard
+            Admin Dashboard
           </h1>
           <div className="flex items-center space-x-4">
             <span className="text-gray-600 hidden sm:inline-block">
@@ -552,4 +565,4 @@ const Developer = () => {
   );
 };
 
-export default Developer;
+export default Admin;

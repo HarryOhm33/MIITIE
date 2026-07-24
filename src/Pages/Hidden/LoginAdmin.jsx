@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../firebase";
+import { auth, db } from "../../../firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
@@ -9,13 +9,13 @@ import {
 } from "firebase/auth";
 import toast from "react-hot-toast";
 
-const LoginDev = () => {
+const LoginAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        navigate("/developer");
+        navigate("/admin");
       }
     });
 
@@ -41,13 +41,12 @@ const LoginDev = () => {
           name: user.displayName,
           email: user.email,
           isAdmin: false,
-          isDeveloper: false,
           createdAt: new Date(),
         });
       }
 
       toast.success("Login successful");
-      navigate("/developer");
+      navigate("/admin");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed");
@@ -57,7 +56,7 @@ const LoginDev = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold mb-4">Developer Login</h1>
+        <h1 className="text-2xl font-bold mb-4">Admin Login</h1>
         <button
           onClick={handleGoogleLogin}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -69,4 +68,4 @@ const LoginDev = () => {
   );
 };
 
-export default LoginDev;
+export default LoginAdmin;

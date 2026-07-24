@@ -60,16 +60,13 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
 
       if (editingEvent) {
         await onUpdate({ ...editingEvent, ...event });
-        toast.success("Event updated successfully");
       } else {
         await onCreate(event);
-        toast.success("Event created successfully");
       }
 
       resetForm();
     } catch (error) {
       console.error("Error saving event:", error);
-      toast.error(error.message || "Failed to save event");
     } finally {
       setIsSubmitting(false);
     }
@@ -111,15 +108,7 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
   };
 
   const handleDelete = async (event) => {
-    if (!window.confirm("Are you sure you want to delete this event?")) return;
-
-    try {
-      await onDelete(event.id);
-      toast.success("Event deleted successfully");
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      toast.error("Failed to delete event");
-    }
+    await onDelete(event.id);
   };
 
   const resetForm = () => {

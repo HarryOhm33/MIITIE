@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    match /users/{userId} {
+      allow get: if signedIn() && (request.auth.uid == userId || isAdmin());
+      allow list: if isAdmin();
+
+      // A newly authenticated user may create only their own non-admin profile.
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.isAdmin == false;
+
+      // Users cannot grant themselves admin access or change profile ownership.
+      allow update: if isAdmin() || (signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.isAdmin == resource.data.isAdmin);
+      allow delete: if isAdmin();
+    }
+
+    match /events/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /incubatees/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /mentors/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /notifications/{document} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -51,16 +51,13 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
 
       if (editingMentor) {
         await onUpdate({ ...editingMentor, ...mentor });
-        toast.success("Mentor updated successfully");
       } else {
         await onCreate(mentor);
-        toast.success("Mentor created successfully");
       }
 
       resetForm();
     } catch (error) {
       console.error("Error saving mentor:", error);
-      toast.error(error.message || "Failed to save mentor");
     } finally {
       setIsSubmitting(false);
     }
@@ -106,15 +103,7 @@ const MentorManagement = ({ mentors, onCreate, onUpdate, onDelete }) => {
   };
 
   const handleDelete = async (mentor) => {
-    if (!window.confirm("Are you sure you want to delete this mentor?")) return;
-
-    try {
-      await onDelete(mentor.id);
-      toast.success("Mentor deleted successfully");
-    } catch (error) {
-      console.error("Error deleting mentor:", error);
-      toast.error("Failed to delete mentor");
-    }
+    await onDelete(mentor.id);
   };
 
   const resetForm = () => {
