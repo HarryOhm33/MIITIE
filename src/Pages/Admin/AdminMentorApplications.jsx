@@ -256,7 +256,7 @@ const AdminMentorApplications = () => {
                     <span className="text-slate-800 font-medium">{selectedApp.experience || "Not provided"}</span>
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-slate-400 block">LinkedIn Profile</span>
+                    <span className="text-xs font-semibold text-slate-400 block">Social Profile</span>
                     {selectedApp.linkedin ? (
                       <a href={selectedApp.linkedin} target="_blank" rel="noreferrer" className="text-orange-500 hover:underline font-medium truncate block">
                         {selectedApp.linkedin}

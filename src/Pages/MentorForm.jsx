@@ -312,7 +312,7 @@ const MentorForm = () => {
                     htmlFor="linkedin"
                     className="block text-gray-700 mb-2 font-medium"
                   >
-                    LinkedIn Profile
+                    Social Profile
                   </label>
                   <div className="relative">
                     <input
@@ -322,7 +322,7 @@ const MentorForm = () => {
                       value={formData.linkedin}
                       onChange={handleChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 pl-10"
-                      placeholder="https://linkedin.com/in/yourprofile"
+                      placeholder="Social profile link (LinkedIn, Twitter, etc.)"
                     />
                     <FaLinkedin className="absolute left-3 top-3 text-gray-400" />
                   </div>

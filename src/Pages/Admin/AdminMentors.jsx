@@ -329,7 +329,7 @@ const AdminMentors = () => {
                     </label>
                     <input
                       type="url"
-                      placeholder="https://linkedin.com/in/username"
+                      placeholder="Social Profile URL"
                       value={mentorData.social}
                       onChange={(e) =>
                         setMentorData({ ...mentorData, social: e.target.value })
@@ -548,7 +548,7 @@ const MentorCard = ({ mentor, onEdit, onDelete }) => (
             rel="noopener noreferrer"
             className="inline-flex items-center text-xs font-bold text-blue-600 hover:text-blue-700 gap-1 hover:underline"
           >
-            <span>LinkedIn Profile</span>
+            <span>Social Profile</span>
             <span>↗</span>
           </a>
         </div>
