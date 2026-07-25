@@ -1,15 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
+import { db, auth } from "../../../firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
+import toast from "react-hot-toast";
 
-const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
+const AdminIncubatees = () => {
+  const [incubatees, setIncubatees] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [editingIncubatee, setEditingIncubatee] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterSector, setFilterSector] = useState("");
-  const [filterBiharStartup, setFilterBiharStartup] = useState("all");
+  const [deletingIncubatee, setDeletingIncubatee] = useState(null);
 
   const [formData, setFormData] = useState({
     startupName: "",
@@ -23,6 +34,37 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
     twitter: "",
     linkedin: "",
   });
+
+  const sortByDateDescending = (items, field) =>
+    [...items].sort((a, b) => {
+      const getTimestamp = (value) => {
+        if (!value) return 0;
+        if (typeof value.toDate === "function") return value.toDate().getTime();
+        const timestamp = new Date(value).getTime();
+        return Number.isNaN(timestamp) ? 0 : timestamp;
+      };
+      return getTimestamp(b[field]) - getTimestamp(a[field]);
+    });
+
+  const fetchIncubatees = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "incubatees"));
+      const incubateesList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setIncubatees(sortByDateDescending(incubateesList, "createdAt"));
+    } catch (error) {
+      console.error("Error fetching incubatees:", error);
+      toast.error("Failed to load incubatees");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchIncubatees();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,13 +82,26 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
 
     try {
       if (isEditing) {
-        await onUpdate({ ...formData, id: editingIncubatee.id });
+        await updateDoc(doc(db, "incubatees", editingIncubatee.id), {
+          ...formData,
+          updatedAt: new Date(),
+        });
+        toast.success("Incubatee updated successfully");
       } else {
-        await onCreate(formData);
+        const incubateeRef = doc(collection(db, "incubatees"));
+        await setDoc(incubateeRef, {
+          id: incubateeRef.id,
+          ...formData,
+          createdAt: new Date(),
+          createdBy: auth.currentUser?.uid || "unknown",
+        });
+        toast.success("Incubatee added successfully");
       }
+      await fetchIncubatees();
       resetForm();
     } catch (error) {
       console.error("Error saving incubatee:", error);
+      toast.error("Failed to save incubatee");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +112,24 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
     setEditingIncubatee(incubatee);
     setFormData(incubatee);
     setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (incubatee) => {
+    setDeletingIncubatee(incubatee);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingIncubatee) return;
+    try {
+      await deleteDoc(doc(db, "incubatees", deletingIncubatee.id));
+      toast.success("Incubatee deleted successfully");
+      await fetchIncubatees();
+    } catch (error) {
+      console.error("Error deleting incubatee:", error);
+      toast.error("Failed to delete incubatee");
+    } finally {
+      setDeletingIncubatee(null);
+    }
   };
 
   const resetForm = () => {
@@ -84,77 +157,40 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
       inc.founderName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inc.coFounderName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       inc.details?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSector =
-      !filterSector ||
-      inc.sector?.toLowerCase().includes(filterSector.toLowerCase());
-    const matchesBihar =
-      filterBiharStartup === "all"
-        ? true
-        : filterBiharStartup === "yes"
-        ? inc.registeredWithBiharStartup
-        : !inc.registeredWithBiharStartup;
-    return matchesQuery && matchesSector && matchesBihar;
+    return matchesQuery;
   });
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500 shadow-sm flex items-center justify-center min-h-[400px]">
+        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header section with Create Button */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800">Manage Incubatees ({incubatees.length})</h3>
-        <button
-          onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
-          }}
-          className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0"
-        >
-          Add New Incubatee
-        </button>
-      </div>
-
-      {/* Advanced Search & Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
+      {/* Header section with Search and Create Button */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-800 shrink-0">Manage Incubatees ({incubatees.length})</h3>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <input
             type="text"
-            placeholder="Search startups, founders, descriptions..."
+            placeholder="Search startups, founders..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+            className="w-full sm:w-64 p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
           />
-        </div>
-        <div className="w-full sm:w-48 shrink-0">
-          <input
-            type="text"
-            placeholder="Filter by sector..."
-            value={filterSector}
-            onChange={(e) => setFilterSector(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
-          />
-        </div>
-        <div className="w-full sm:w-48 shrink-0">
-          <select
-            value={filterBiharStartup}
-            onChange={(e) => setFilterBiharStartup(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
-          >
-            <option value="all">All Startups</option>
-            <option value="yes">Bihar Startup Registered</option>
-            <option value="no">Not Registered</option>
-          </select>
-        </div>
-        {(searchQuery || filterSector || filterBiharStartup !== "all") && (
           <button
             onClick={() => {
-              setSearchQuery("");
-              setFilterSector("");
-              setFilterBiharStartup("all");
+              resetForm();
+              setIsModalOpen(true);
             }}
-            className="px-4 py-2.5 text-xs text-orange-500 hover:text-orange-600 font-bold border-0 bg-transparent cursor-pointer"
+            className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0 shrink-0"
           >
-            Clear Filters
+            Add New Incubatee
           </button>
-        )}
+        </div>
       </div>
 
       {/* Modal form container */}
@@ -182,7 +218,7 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
                 <h2 className="text-lg font-bold text-slate-800">
                   {isEditing ? "Edit Incubatee Details" : "Add New Incubatee"}
                 </h2>
-                <button onClick={resetForm} className="text-slate-400 hover:text-slate-650 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
+                <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
@@ -334,17 +370,17 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
                 </div>
 
                 <div className="flex justify-end space-x-3 pt-4 border-t border-slate-100">
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-705 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
-                    disabled={isSubmitting}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-350 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
+                      <button
+                        type="button"
+                        onClick={resetForm}
+                        className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                        disabled={isSubmitting}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-300 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -379,6 +415,50 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingIncubatee && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeletingIncubatee(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10 p-6 flex flex-col items-center text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-4">
+                <FaTrash className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Delete Incubatee?</h3>
+              <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+                Are you sure you want to delete <span className="font-semibold text-slate-700">"{deletingIncubatee.startupName}"</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 w-full mt-6">
+                <button
+                  onClick={() => setDeletingIncubatee(null)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold cursor-pointer border-0 shadow"
+                >
+                  Delete
+                </button>
+              </div>
             </motion.div>
           </div>
         )}
@@ -452,8 +532,8 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
                           <FaEdit size={16} />
                         </button>
                         <button
-                          onClick={() => onDelete(incubatee)}
-                          className="p-1.5 text-red-655 hover:bg-red-50 hover:text-red-755 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
+                          onClick={() => handleDeleteClick(incubatee)}
+                          className="p-1.5 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
                           title="Delete"
                         >
                           <FaTrash size={16} />
@@ -475,4 +555,4 @@ const IncubateeManagement = ({ incubatees, onCreate, onUpdate, onDelete }) => {
   );
 };
 
-export default IncubateeManagement;
+export default AdminIncubatees;

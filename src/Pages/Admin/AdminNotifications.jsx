@@ -1,25 +1,62 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { db, auth } from "../../../firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
 
-const NotificationManagement = ({
-  notifications,
-  onCreate,
-  onUpdate,
-  onDelete,
-}) => {
+const AdminNotifications = () => {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingNotification, setEditingNotification] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterImportant, setFilterImportant] = useState("all");
+  const [deletingNotification, setDeletingNotification] = useState(null);
 
   const [notificationData, setNotificationData] = useState({
     title: "",
     description: "",
     isImportant: false,
   });
+
+  const sortByDateDescending = (items, field) =>
+    [...items].sort((a, b) => {
+      const getTimestamp = (value) => {
+        if (!value) return 0;
+        if (typeof value.toDate === "function") return value.toDate().getTime();
+        const timestamp = new Date(value).getTime();
+        return Number.isNaN(timestamp) ? 0 : timestamp;
+      };
+      return getTimestamp(b[field]) - getTimestamp(a[field]);
+    });
+
+  const fetchNotifications = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "notifications"));
+      const notificationsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotifications(sortByDateDescending(notificationsList, "createdAt"));
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      toast.error("Failed to load notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,26 +65,33 @@ const NotificationManagement = ({
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
       if (!notificationData.title || !notificationData.description) {
         toast.error("Please fill all required fields");
         return;
       }
 
-      const notification = {
-        ...notificationData,
-        createdAt: new Date().toISOString(),
-      };
-
       if (editingNotification) {
-        await onUpdate({ ...editingNotification, ...notification });
+        await updateDoc(doc(db, "notifications", editingNotification.id), {
+          ...notificationData,
+          updatedAt: new Date().toISOString(),
+        });
+        toast.success("Notification updated successfully");
       } else {
-        await onCreate(notification);
+        const notificationRef = doc(collection(db, "notifications"));
+        await setDoc(notificationRef, {
+          id: notificationRef.id,
+          ...notificationData,
+          createdAt: new Date().toISOString(),
+          createdBy: auth.currentUser?.uid || "unknown",
+        });
+        toast.success("Notification created successfully");
       }
 
+      await fetchNotifications();
       resetForm();
     } catch (error) {
       console.error("Error saving notification:", error);
+      toast.error("Failed to save notification");
     } finally {
       setIsSubmitting(false);
     }
@@ -61,6 +105,24 @@ const NotificationManagement = ({
       isImportant: notification.isImportant || false,
     });
     setIsModalOpen(true);
+  };
+
+  const handleDeleteClick = (notification) => {
+    setDeletingNotification(notification);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingNotification) return;
+    try {
+      await deleteDoc(doc(db, "notifications", deletingNotification.id));
+      toast.success("Notification deleted successfully");
+      await fetchNotifications();
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+      toast.error("Failed to delete notification");
+    } finally {
+      setDeletingNotification(null);
+    }
   };
 
   const resetForm = () => {
@@ -78,64 +140,40 @@ const NotificationManagement = ({
       !searchQuery ||
       notif.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       notif.description?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesImportant =
-      filterImportant === "all"
-        ? true
-        : filterImportant === "important"
-        ? notif.isImportant
-        : !notif.isImportant;
-    return matchesQuery && matchesImportant;
+    return matchesQuery;
   });
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500 shadow-sm flex items-center justify-center min-h-[400px]">
+        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header section with Create Button */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800">Manage Notifications ({notifications.length})</h3>
-        <button
-          onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
-          }}
-          className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0"
-        >
-          Add New Notification
-        </button>
-      </div>
-
-      {/* Advanced Search & Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
+      {/* Header section with Search and Create Button */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-800 shrink-0">Manage Notifications ({notifications.length})</h3>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <input
             type="text"
-            placeholder="Search notifications by title or message..."
+            placeholder="Search notifications..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+            className="w-full sm:w-64 p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
           />
-        </div>
-        <div className="w-full sm:w-48 shrink-0">
-          <select
-            value={filterImportant}
-            onChange={(e) => setFilterImportant(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
-          >
-            <option value="all">All Notifications</option>
-            <option value="important">Important Only</option>
-            <option value="regular">Regular Only</option>
-          </select>
-        </div>
-        {(searchQuery || filterImportant !== "all") && (
           <button
             onClick={() => {
-              setSearchQuery("");
-              setFilterImportant("all");
+              resetForm();
+              setIsModalOpen(true);
             }}
-            className="px-4 py-2.5 text-xs text-orange-500 hover:text-orange-600 font-bold border-0 bg-transparent cursor-pointer"
+            className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0 shrink-0"
           >
-            Clear Filters
+            Add New Notification
           </button>
-        )}
+        </div>
       </div>
 
       {/* Modal form container */}
@@ -163,7 +201,7 @@ const NotificationManagement = ({
                 <h2 className="text-lg font-bold text-slate-800">
                   {editingNotification ? "Edit Notification Details" : "Create New Notification"}
                 </h2>
-                <button onClick={resetForm} className="text-slate-400 hover:text-slate-650 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
+                <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
@@ -230,14 +268,14 @@ const NotificationManagement = ({
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-705 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
                     disabled={isSubmitting}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-350 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
+                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-300 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -277,6 +315,50 @@ const NotificationManagement = ({
         )}
       </AnimatePresence>
 
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingNotification && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeletingNotification(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10 p-6 flex flex-col items-center text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-4">
+                <FaTrash className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Delete Notification?</h3>
+              <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+                Are you sure you want to delete <span className="font-semibold text-slate-700">"{deletingNotification.title}"</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 w-full mt-6">
+                <button
+                  onClick={() => setDeletingNotification(null)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold cursor-pointer border-0 shadow"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Notifications List */}
       {filteredNotifications.length > 0 ? (
         <div className="grid grid-cols-1 gap-4">
@@ -285,7 +367,7 @@ const NotificationManagement = ({
               key={notification.id}
               notification={notification}
               onEdit={handleEdit}
-              onDelete={onDelete}
+              onDelete={handleDeleteClick}
             />
           ))}
         </div>
@@ -326,7 +408,7 @@ const NotificationCard = ({ notification, onEdit, onDelete }) => {
               {notification.title}
             </h4>
             {isNew() && (
-              <span className="px-2 py-0.5 text-[10px] bg-green-150 text-green-755 rounded-full font-bold animate-pulse">
+              <span className="px-2 py-0.5 text-[10px] bg-green-100 text-green-700 rounded-full font-bold animate-pulse">
                 New
               </span>
             )}
@@ -353,7 +435,7 @@ const NotificationCard = ({ notification, onEdit, onDelete }) => {
         </button>
         <button
           onClick={() => onDelete(notification)}
-          className="p-2 text-red-655 hover:bg-red-50 hover:text-red-755 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
+          className="p-2 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
           title="Delete"
         >
           <FaTrash className="w-4 h-4" />
@@ -363,4 +445,4 @@ const NotificationCard = ({ notification, onEdit, onDelete }) => {
   );
 };
 
-export default NotificationManagement;
+export default AdminNotifications;

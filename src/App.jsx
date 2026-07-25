@@ -15,9 +15,16 @@ import Terms from "./Pages/Terms";
 import MentorForm from "./Pages/MentorForm";
 import PastEvents from "./Pages/PastEvents";
 import Incubatees from "./Pages/Incubatees";
-import Admin from "./Pages/Hidden/Admin";
-import LoginAdmin from "./Pages/Hidden/LoginAdmin";
-import LogoutAdmin from "./Pages/Hidden/LogoutAdmin";
+import Admin from "./layouts/AdminLayout";
+import LoginAdmin from "./Pages/Admin/LoginAdmin";
+import LogoutAdmin from "./Pages/Admin/LogoutAdmin";
+
+// Admin Dashboard Pages
+import AdminOverview from "./Pages/Admin/AdminOverview";
+import AdminEvents from "./Pages/Admin/AdminEvents";
+import AdminIncubatees from "./Pages/Admin/AdminIncubatees";
+import AdminMentors from "./Pages/Admin/AdminMentors";
+import AdminNotifications from "./Pages/Admin/AdminNotifications";
 
 function AppContent() {
   const location = useLocation();
@@ -48,8 +55,14 @@ function AppContent() {
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/terms" element={<Terms />} />
 
-          {/* Admin Dashboard & Auth (Nested routes: /admin, /admin/events, /admin/incubatees, /admin/mentors, /admin/notifications) */}
-          <Route path="/admin/*" element={<Admin />} />
+          {/* Admin Dashboard Layout & Sub-Routes */}
+          <Route path="/admin" element={<Admin />}>
+            <Route index element={<AdminOverview />} />
+            <Route path="events" element={<AdminEvents />} />
+            <Route path="incubatees" element={<AdminIncubatees />} />
+            <Route path="mentors" element={<AdminMentors />} />
+            <Route path="notifications" element={<AdminNotifications />} />
+          </Route>
           <Route path="/loginadmin" element={<LoginAdmin />} />
           <Route path="/logoutadmin" element={<LogoutAdmin />} />
 

@@ -31,12 +31,10 @@ const LoginAdmin = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      // console.log(user);
 
       // Check if user exists in Firestore
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
-      // console.log(userSnap);
 
       if (!userSnap.exists()) {
         // Create new user document

@@ -1,17 +1,28 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaImage, FaTimes } from "react-icons/fa";
 import { uploadImage } from "../../utils/cloudinary";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { db, auth } from "../../../firebase";
+import {
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+} from "firebase/firestore";
 
-const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
+const AdminEvents = () => {
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchDate, setSearchDate] = useState("");
+  const [deletingEvent, setDeletingEvent] = useState(null);
   const [eventData, setEventData] = useState({
     title: "",
     date: "",
@@ -24,6 +35,37 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
     registrationLink: "",
   });
 
+  const sortByDateDescending = (items, field) =>
+    [...items].sort((a, b) => {
+      const getTimestamp = (value) => {
+        if (!value) return 0;
+        if (typeof value.toDate === "function") return value.toDate().getTime();
+        const timestamp = new Date(value).getTime();
+        return Number.isNaN(timestamp) ? 0 : timestamp;
+      };
+      return getTimestamp(b[field]) - getTimestamp(a[field]);
+    });
+
+  const fetchEvents = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, "events"));
+      const eventsList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setEvents(sortByDateDescending(eventsList, "date"));
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      toast.error("Failed to load events");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (isSubmitting) return;
@@ -31,7 +73,6 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
     setIsSubmitting(true);
 
     try {
-      // Validate required fields
       if (
         !eventData.title ||
         !eventData.date ||
@@ -45,7 +86,6 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
 
       let imageUrl = eventData.image;
 
-      // Upload new image if selected
       if (selectedImage) {
         try {
           const uploadResult = await uploadImage(selectedImage);
@@ -63,14 +103,27 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
       };
 
       if (editingEvent) {
-        await onUpdate({ ...editingEvent, ...event });
+        await updateDoc(doc(db, "events", editingEvent.id), {
+          ...event,
+          updatedAt: new Date(),
+        });
+        toast.success("Event updated successfully");
       } else {
-        await onCreate(event);
+        const eventRef = doc(collection(db, "events"));
+        await setDoc(eventRef, {
+          id: eventRef.id,
+          ...event,
+          createdAt: new Date(),
+          createdBy: auth.currentUser?.uid || "unknown",
+        });
+        toast.success("Event created successfully");
       }
 
+      await fetchEvents();
       resetForm();
     } catch (error) {
       console.error("Error saving event:", error);
+      toast.error("Failed to save event");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +133,6 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate file type and size
     if (!file.type.match("image.*")) {
       toast.error("Please select an image file (JPG, PNG, GIF)");
       return;
@@ -111,8 +163,22 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
     setIsModalOpen(true);
   };
 
-  const handleDelete = async (event) => {
-    await onDelete(event);
+  const handleDeleteClick = (event) => {
+    setDeletingEvent(event);
+  };
+
+  const confirmDelete = async () => {
+    if (!deletingEvent) return;
+    try {
+      await deleteDoc(doc(db, "events", deletingEvent.id));
+      toast.success("Event deleted successfully");
+      await fetchEvents();
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      toast.error("Failed to delete event");
+    } finally {
+      setDeletingEvent(null);
+    }
   };
 
   const resetForm = () => {
@@ -139,57 +205,40 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
       event.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       event.location?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDate = !searchDate || event.date?.startsWith(searchDate);
-    return matchesQuery && matchesDate;
+    return matchesQuery;
   });
+
+  if (loading) {
+    return (
+      <div className="bg-white border border-slate-100 rounded-2xl p-12 text-center text-slate-500 shadow-sm flex items-center justify-center min-h-[400px]">
+        <div className="w-10 h-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header section with Create Button */}
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-        <h3 className="text-lg font-bold text-slate-800">Manage Events ({events.length})</h3>
-        <button
-          onClick={() => {
-            resetForm();
-            setIsModalOpen(true);
-          }}
-          className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0"
-        >
-          Add New Event
-        </button>
-      </div>
-
-      {/* Advanced Search & Filters */}
-      <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm flex flex-col sm:flex-row gap-3">
-        <div className="flex-1">
+      {/* Header section with Search and Create Button */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+        <h3 className="text-lg font-bold text-slate-800 shrink-0">Manage Events ({events.length})</h3>
+        <div className="flex items-center gap-3 w-full sm:w-auto">
           <input
             type="text"
-            placeholder="Search events by title, description, location..."
+            placeholder="Search events..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
+            className="w-full sm:w-64 p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
           />
-        </div>
-        <div className="w-full sm:w-48 shrink-0">
-          <input
-            type="date"
-            value={searchDate}
-            onChange={(e) => setSearchDate(e.target.value)}
-            className="w-full p-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-400 text-sm bg-white"
-            title="Filter by event date"
-          />
-        </div>
-        {(searchQuery || searchDate) && (
           <button
             onClick={() => {
-              setSearchQuery("");
-              setSearchDate("");
+              resetForm();
+              setIsModalOpen(true);
             }}
-            className="px-4 py-2.5 text-xs text-orange-500 hover:text-orange-600 font-bold border-0 bg-transparent cursor-pointer"
+            className="px-4 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-bold text-xs shadow transition-colors cursor-pointer border-0 shrink-0"
           >
-            Clear Filters
+            Add New Event
           </button>
-        )}
+        </div>
       </div>
 
       {/* Modal form container */}
@@ -217,7 +266,7 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
                 <h2 className="text-lg font-bold text-slate-800">
                   {editingEvent ? "Edit Event Details" : "Create New Event"}
                 </h2>
-                <button onClick={resetForm} className="text-slate-400 hover:text-slate-650 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
+                <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg border-0 bg-transparent cursor-pointer">
                   <FaTimes className="w-5 h-5" />
                 </button>
               </div>
@@ -386,14 +435,14 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-705 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                    className="px-5 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
                     disabled={isSubmitting}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-350 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
+                    className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-xl text-sm font-bold disabled:bg-orange-300 flex items-center justify-center min-w-32 cursor-pointer border-0 shadow"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
@@ -433,6 +482,50 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
         )}
       </AnimatePresence>
 
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deletingEvent && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeletingEvent(null)}
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative z-10 p-6 flex flex-col items-center text-center"
+            >
+              <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center text-red-500 mb-4">
+                <FaTrash className="w-5 h-5" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Delete Event?</h3>
+              <p className="text-slate-500 text-sm mt-2 leading-relaxed">
+                Are you sure you want to delete <span className="font-semibold text-slate-700">"{deletingEvent.title}"</span>? This action cannot be undone.
+              </p>
+              <div className="flex gap-3 w-full mt-6">
+                <button
+                  onClick={() => setDeletingEvent(null)}
+                  className="flex-1 px-4 py-2.5 border border-slate-200 rounded-xl text-slate-700 hover:bg-slate-50 text-sm font-bold cursor-pointer bg-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold cursor-pointer border-0 shadow"
+                >
+                  Delete
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       {/* Events List */}
       {filteredEvents.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -441,7 +534,7 @@ const EventManagement = ({ events, onCreate, onUpdate, onDelete }) => {
               key={event.id}
               event={event}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteClick}
             />
           ))}
         </div>
@@ -518,7 +611,7 @@ const EventCard = ({ event, onEdit, onDelete }) => (
       </button>
       <button
         onClick={() => onDelete(event)}
-        className="p-2 text-red-655 hover:bg-red-50 hover:text-red-755 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
+        className="p-2 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors border-0 cursor-pointer bg-transparent"
         title="Delete"
       >
         <FaTrash className="w-4 h-4" />
@@ -527,4 +620,4 @@ const EventCard = ({ event, onEdit, onDelete }) => (
   </div>
 );
 
-export default EventManagement;
+export default AdminEvents;
