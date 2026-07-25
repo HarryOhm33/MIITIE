@@ -59,8 +59,8 @@ const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
   const menuItems = [
     { name: "Events", path: "/admin/events", icon: <FaCalendarAlt className="w-5 h-5" /> },
     { name: "Incubatees", path: "/admin/incubatees", icon: <FaLightbulb className="w-5 h-5" /> },
-    { name: "Notifications", path: "/admin/notifications", icon: <FaBell className="w-5 h-5" /> },
     { name: "Mentors", path: "/admin/mentors", icon: <FaUsers className="w-5 h-5" /> },
+    { name: "Notifications", path: "/admin/notifications", icon: <FaBell className="w-5 h-5" /> },
     {
       name: "Mentor Apps",
       path: "/admin/mentor-applications",
