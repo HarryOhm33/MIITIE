@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { db } from "../../firebase";
 import { collection, addDoc } from "firebase/firestore";
+import ReCaptchaWidget from "../components/ReCaptchaWidget";
 
 const MentorForm = () => {
   useEffect(() => {
@@ -30,6 +31,7 @@ const MentorForm = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,9 +62,27 @@ const MentorForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      toast.error("Please complete the CAPTCHA verification.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Verify CAPTCHA token with Netlify serverless function
+      const verifyRes = await fetch("/.netlify/functions/verify-captcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: captchaToken }),
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.success) {
+        throw new Error(verifyData.error || "CAPTCHA verification failed");
+      }
+
       await addDoc(collection(db, "mentor_applications"), {
         ...formData,
         status: "Pending",
@@ -70,6 +90,7 @@ const MentorForm = () => {
       });
 
       toast.success("Mentor application submitted successfully!");
+      setCaptchaToken(null);
       setFormData({
         name: "",
         email: "",
@@ -345,19 +366,26 @@ const MentorForm = () => {
 
             <motion.div
               variants={itemVariants}
-              className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t pt-6"
+              className="space-y-4 border-t pt-6"
             >
-              <p className="text-gray-600 text-sm">
-                By submitting this form, you agree to our{" "}
-                <Link to="/terms" className="text-orange-500 hover:underline">
-                  Terms and Conditions
-                </Link>
-                .
-              </p>
-              <motion.button
+              <ReCaptchaWidget
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
+
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p className="text-gray-600 text-sm">
+                  By submitting this form, you agree to our{" "}
+                  <Link to="/terms" className="text-orange-500 hover:underline">
+                    Terms and Conditions
+                  </Link>
+                  .
+                </p>
+
+                <motion.button
                 type="submit"
                 disabled={isSubmitting}
-                className={`px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 ${
+                className={`px-8 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 cursor-pointer ${
                   isSubmitting ? "opacity-70 cursor-not-allowed" : ""
                 }`}
                 whileHover={{ scale: 1.02 }}
@@ -391,6 +419,7 @@ const MentorForm = () => {
                   "Apply to Mentor"
                 )}
               </motion.button>
+              </div>
             </motion.div>
           </motion.form>
         </motion.div>

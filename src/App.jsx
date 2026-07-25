@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import About from "./Pages/About";
@@ -20,7 +20,6 @@ import LoginAdmin from "./Pages/Admin/LoginAdmin";
 import LogoutAdmin from "./Pages/Admin/LogoutAdmin";
 
 // Admin Dashboard Pages
-import AdminOverview from "./Pages/Admin/AdminOverview";
 import AdminEvents from "./Pages/Admin/AdminEvents";
 import AdminIncubatees from "./Pages/Admin/AdminIncubatees";
 import AdminMentors from "./Pages/Admin/AdminMentors";
@@ -65,7 +64,7 @@ function AppContent() {
 
           {/* Admin Dashboard Layout & Sub-Routes */}
           <Route path="/admin" element={<Admin />}>
-            <Route index element={<AdminOverview />} />
+            <Route index element={<Navigate to="events" replace />} />
             <Route path="events" element={<AdminEvents />} />
             <Route path="incubatees" element={<AdminIncubatees />} />
             <Route path="mentors" element={<AdminMentors />} />

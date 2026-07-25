@@ -9,6 +9,7 @@ import {
 import toast from "react-hot-toast";
 import { db } from "../../firebase";
 import { collection, addDoc } from "firebase/firestore";
+import ReCaptchaWidget from "../components/ReCaptchaWidget";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +19,7 @@ const ContactUs = () => {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -52,9 +54,27 @@ const ContactUs = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      toast.error("Please complete the CAPTCHA verification.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      // Verify CAPTCHA token with Netlify serverless function
+      const verifyRes = await fetch("/.netlify/functions/verify-captcha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: captchaToken }),
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.success) {
+        throw new Error(verifyData.error || "CAPTCHA verification failed");
+      }
+
       // Save to Firebase Firestore collection
       await addDoc(collection(db, "contact_submissions"), {
         ...formData,
@@ -63,6 +83,7 @@ const ContactUs = () => {
       });
 
       toast.success("Form submitted! We will get back to you shortly.");
+      setCaptchaToken(null);
       setFormData({
         name: "",
         email: "",
@@ -257,10 +278,15 @@ const ContactUs = () => {
                 ></textarea>
               </motion.div>
 
+              <ReCaptchaWidget
+                onVerify={(token) => setCaptchaToken(token)}
+                onExpire={() => setCaptchaToken(null)}
+              />
+
               <motion.button
                 type="submit"
                 variants={itemVariants}
-                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Sending..." : "Send Message"}
