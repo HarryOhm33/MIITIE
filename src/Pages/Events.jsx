@@ -241,7 +241,7 @@ const Events = () => {
                   className="bg-white border border-orange-200 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all"
                 >
                   <div
-                    className="relative h-56 w-full overflow-hidden group cursor-zoom-in"
+                    className="relative h-56 w-full overflow-hidden group cursor-pointer"
                     onClick={() => openFullscreen(event.image, event.alt)}
                   >
                     <img
