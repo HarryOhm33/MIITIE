@@ -58,6 +58,7 @@ const LoginAdmin = () => {
           email: user.email,
           isAdmin: false,
           isSuperAdmin: false,
+          isMailNotif: false,
           createdAt: new Date(),
         });
       } else {
@@ -69,6 +70,7 @@ const LoginAdmin = () => {
         const updates = {};
         if (data.isAdmin === undefined) updates.isAdmin = false;
         if (data.isSuperAdmin === undefined) updates.isSuperAdmin = false;
+        if (data.isMailNotif === undefined) updates.isMailNotif = false;
         if (data.hasOwnProperty("isDeveloper")) {
           updates.isDeveloper = deleteField();
         }

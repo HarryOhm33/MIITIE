@@ -12,6 +12,7 @@ import {
   FaEnvelopeOpenText,
   FaEllipsisH,
   FaTimes,
+  FaCog,
 } from "react-icons/fa";
 import miitieLogoMini from "../../assets/miitie-logo-mini.png";
 import { db } from "../../../firebase";
@@ -78,6 +79,7 @@ const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
       icon: <FaEnvelopeOpenText className="w-5 h-5" />,
       hasBadge: hasPendingContacts,
     },
+    { name: "Settings", path: "/admin/settings", icon: <FaCog className="w-5 h-5" /> },
   ];
 
   // Mobile Bottom Bar displays first 4 primary items + "More"

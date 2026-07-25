@@ -27,6 +27,7 @@ import AdminMentorApplications from "./Pages/Admin/AdminMentorApplications";
 import AdminIncubationApplications from "./Pages/Admin/AdminIncubationApplications";
 import AdminContactSubmissions from "./Pages/Admin/AdminContactSubmissions";
 import AdminNotifications from "./Pages/Admin/AdminNotifications";
+import AdminSettings from "./Pages/Admin/AdminSettings";
 
 // Super Admin Pages
 import SuperAdminLayout from "./layouts/SuperAdminLayout";
@@ -72,6 +73,7 @@ function AppContent() {
             <Route path="incubation-applications" element={<AdminIncubationApplications />} />
             <Route path="contact-submissions" element={<AdminContactSubmissions />} />
             <Route path="notifications" element={<AdminNotifications />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
           <Route path="/loginadmin" element={<LoginAdmin />} />
           <Route path="/logoutadmin" element={<LogoutAdmin />} />

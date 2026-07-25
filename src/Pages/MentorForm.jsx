@@ -89,6 +89,16 @@ const MentorForm = () => {
         createdAt: new Date().toISOString(),
       });
 
+      // Dispatch email notifications (submitter confirmation & admin alerts)
+      fetch("/.netlify/functions/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "mentor",
+          data: formData,
+        }),
+      }).catch((err) => console.error("Email notification dispatch error:", err));
+
       toast.success("Mentor application submitted successfully!");
       setCaptchaToken(null);
       setFormData({
