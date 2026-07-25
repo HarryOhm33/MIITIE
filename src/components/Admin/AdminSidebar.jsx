@@ -6,10 +6,11 @@ import {
   FaLightbulb,
   FaUsers,
   FaBell,
+  FaUsersCog,
 } from "react-icons/fa";
 import miitieLogoMini from "../../assets/miitie-logo-mini.jpg";
 
-const AdminSidebar = ({ userName, onLogout }) => {
+const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
   const location = useLocation();
 
   const menuItems = [
@@ -62,18 +63,19 @@ const AdminSidebar = ({ userName, onLogout }) => {
             </Link>
           );
         })}
-        {/* Mobile Only Sign Out Tab */}
-        <button
-          onClick={onLogout}
-          className="flex md:hidden flex-col items-center justify-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 w-full text-center hover:text-red-400 text-slate-400 border-0 bg-transparent cursor-pointer"
-        >
-          <FaSignOutAlt className="w-5 h-5" />
-          <span className="text-[9px] font-semibold tracking-tight">Sign Out</span>
-        </button>
       </nav>
 
       {/* Sidebar Footer / Logout (Desktop Only) */}
-      <div className="hidden md:block p-4 border-t border-slate-800">
+      <div className="hidden md:block p-4 border-t border-slate-800 space-y-2">
+        {isSuperAdmin && (
+          <Link
+            to="/superadmin"
+            className="w-full flex items-center justify-center gap-2.5 px-4 py-3 text-sm font-semibold text-amber-400 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 rounded-xl transition-all duration-200 border-0"
+          >
+            <FaUsersCog className="w-4 h-4" />
+            <span>Super Admin Dashboard</span>
+          </Link>
+        )}
         <button
           onClick={onLogout}
           className="w-full flex items-center justify-center gap-2.5 px-4 py-3 text-sm font-semibold text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all duration-200 focus:outline-none cursor-pointer border-0"

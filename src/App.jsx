@@ -26,14 +26,19 @@ import AdminIncubatees from "./Pages/Admin/AdminIncubatees";
 import AdminMentors from "./Pages/Admin/AdminMentors";
 import AdminNotifications from "./Pages/Admin/AdminNotifications";
 
+// Super Admin Pages
+import SuperAdminLayout from "./layouts/SuperAdminLayout";
+import SuperAdminDashboard from "./Pages/SuperAdmin/SuperAdminDashboard";
+
 function AppContent() {
   const location = useLocation();
   
-  // Hide main Navbar and Footer on Admin Portal pages and admin login/logout pages
+  // Hide main Navbar and Footer on Admin & Super Admin Portal pages and login/logout pages
   const isAdminPath =
     location.pathname.startsWith("/admin") ||
     location.pathname.startsWith("/loginadmin") ||
-    location.pathname.startsWith("/logoutadmin");
+    location.pathname.startsWith("/logoutadmin") ||
+    location.pathname.startsWith("/superadmin");
 
   return (
     <div className={`flex flex-col ${isAdminPath ? "h-screen overflow-hidden" : "min-h-screen"}`}>
@@ -65,6 +70,11 @@ function AppContent() {
           </Route>
           <Route path="/loginadmin" element={<LoginAdmin />} />
           <Route path="/logoutadmin" element={<LogoutAdmin />} />
+
+          {/* Super Admin Dashboard Layout & Sub-Routes */}
+          <Route path="/superadmin" element={<SuperAdminLayout />}>
+            <Route index element={<SuperAdminDashboard />} />
+          </Route>
 
           {/* Fallback Route */}
           <Route path="*" element={<NotFound />} />

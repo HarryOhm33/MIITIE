@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useNavigate, Outlet } from "react-router-dom";
+import { useNavigate, Outlet, Link } from "react-router-dom";
 import { auth, db } from "../../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaSignOutAlt, FaUsersCog } from "react-icons/fa";
 import toast from "react-hot-toast";
 import AdminSidebar from "../components/Admin/AdminSidebar";
 import miitieLogoMini from "../assets/miitie-logo-mini.jpg";
@@ -12,6 +12,7 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -32,6 +33,7 @@ const AdminLayout = () => {
         }
 
         setUserName(user.displayName || "Admin");
+        setIsSuperAdmin(userSnap.data().isSuperAdmin === true);
       } catch (error) {
         console.error("Authentication error:", error);
         toast.error("Authentication failed");
@@ -78,17 +80,28 @@ const AdminLayout = () => {
             <span className="text-[8px] text-orange-400 uppercase tracking-widest font-semibold mt-0.5 block">Admin Suite</span>
           </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="p-2 text-slate-400 hover:text-red-400 transition-colors cursor-pointer border-0 bg-transparent"
-          title="Sign Out"
-        >
-          <FaSignOutAlt className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-3">
+          {isSuperAdmin && (
+            <Link
+              to="/superadmin"
+              className="p-2 text-amber-500 hover:text-amber-400 transition-colors"
+              title="Super Admin Dashboard"
+            >
+              <FaUsersCog className="w-5 h-5" />
+            </Link>
+          )}
+          <button
+            onClick={handleLogout}
+            className="p-2 text-slate-400 hover:text-red-400 transition-colors cursor-pointer border-0 bg-transparent"
+            title="Sign Out"
+          >
+            <FaSignOutAlt className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Admin Sidebar Navigation */}
-      <AdminSidebar userName={userName} onLogout={handleLogout} />
+      <AdminSidebar userName={userName} onLogout={handleLogout} isSuperAdmin={isSuperAdmin} />
 
       {/* Main Content Area */}
       <main className="flex-grow flex-1 overflow-y-auto md:h-full pb-20 md:pb-6 p-4 sm:p-6 lg:p-8 bg-slate-50">

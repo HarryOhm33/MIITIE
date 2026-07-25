@@ -17,9 +17,22 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        navigate("/admin");
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            if (data.isSuperAdmin === true) {
+              navigate("/superadmin");
+            } else if (data.isAdmin === true) {
+              navigate("/admin");
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
       }
     });
 
@@ -36,6 +49,9 @@ const LoginAdmin = () => {
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
+      let isUserAdmin = false;
+      let isUserSuperAdmin = false;
+
       if (!userSnap.exists()) {
         // Create new user document
         await setDoc(userRef, {
@@ -43,17 +59,38 @@ const LoginAdmin = () => {
           name: user.displayName,
           email: user.email,
           isAdmin: false,
+          isSuperAdmin: false,
           createdAt: new Date(),
         });
-      } else if (userSnap.data().hasOwnProperty("isDeveloper")) {
-        // Proactively remove the deprecated isDeveloper field from existing users
-        await updateDoc(userRef, {
-          isDeveloper: deleteField(),
-        });
+      } else {
+        const data = userSnap.data();
+        isUserAdmin = data.isAdmin === true;
+        isUserSuperAdmin = data.isSuperAdmin === true;
+
+        // Proactively initialize missing fields for existing users
+        const updates = {};
+        if (data.isAdmin === undefined) updates.isAdmin = false;
+        if (data.isSuperAdmin === undefined) updates.isSuperAdmin = false;
+        if (data.hasOwnProperty("isDeveloper")) {
+          updates.isDeveloper = deleteField();
+        }
+        if (Object.keys(updates).length > 0) {
+          await updateDoc(userRef, updates);
+        }
+      }
+
+      if (!isUserAdmin && !isUserSuperAdmin) {
+        await signOut(auth);
+        toast.error("Insufficient permissions. Logged out.");
+        return;
       }
 
       toast.success("Login successful");
-      navigate("/admin");
+      if (isUserSuperAdmin) {
+        navigate("/superadmin");
+      } else {
+        navigate("/admin");
+      }
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed");
