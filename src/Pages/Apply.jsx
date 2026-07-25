@@ -396,16 +396,19 @@ const Apply = () => {
                   >
                     Team Members
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     id="teamMembers"
                     name="teamMembers"
                     value={formData.teamMembers}
                     onChange={handleChange}
+                    rows="3"
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
                     placeholder="Names and roles of team members"
-                    maxLength="200"
-                  />
+                    maxLength="500"
+                  ></textarea>
+                  <span className="text-xs text-gray-500 block text-right mt-1">
+                    {formData.teamMembers.length}/500 characters
+                  </span>
                 </div>
               </motion.div>
             </div>
