@@ -6,6 +6,7 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";

@@ -31,6 +31,7 @@ const MentorForm = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [captchaToken, setCaptchaToken] = useState(null);
 
   const containerVariants = {
@@ -100,6 +101,7 @@ const MentorForm = () => {
       }).catch((err) => console.error("Email notification dispatch error:", err));
 
       toast.success("Mentor application submitted successfully!");
+      setSubmitSuccess(true);
       setCaptchaToken(null);
       setFormData({
         name: "",
@@ -118,6 +120,66 @@ const MentorForm = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (submitSuccess) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="min-h-screen bg-gradient-to-r from-orange-50 to-yellow-50 py-12 px-4"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md text-center"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2 }}
+            className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+          >
+            <svg
+              className="w-10 h-10 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M5 13l4 4L19 7"
+              ></path>
+            </svg>
+          </motion.div>
+          <h2 className="text-3xl font-bold text-gray-800 mb-4">
+            Application Submitted!
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Thank you for applying to join the MIITIE Mentor Network.
+            We've received your application and will review it shortly.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link
+              to="/"
+              className="px-6 py-3 bg-orange-500 text-white font-medium rounded-md hover:bg-orange-600 transition-colors"
+            >
+              Back to Home
+            </Link>
+            <Link
+              to="/mentors"
+              className="px-6 py-3 border border-orange-500 text-orange-500 font-medium rounded-md hover:bg-orange-50 transition-colors"
+            >
+              View Our Mentors
+            </Link>
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-orange-50 to-yellow-50 py-12">
