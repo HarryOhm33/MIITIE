@@ -143,9 +143,10 @@ const Events = () => {
           ...doc.data(),
         }))
         .filter((event) => {
-          const start = new Date(event.date);
-          const end = new Date(start.getTime() + 18 * 60 * 60 * 1000); // 10 hours later
-          return end >= now; // still ongoing or upcoming
+          if (!event.date) return false;
+          const cutoff = new Date(event.date);
+          cutoff.setHours(20, 0, 0, 0); // 8:00 PM cutoff
+          return now <= cutoff;
         })
         .sort((a, b) => new Date(a.date) - new Date(b.date)); // sort by start
 
@@ -155,6 +156,16 @@ const Events = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const openFullscreen = (image, alt) => {
@@ -248,7 +259,7 @@ const Events = () => {
                     <div className="flex flex-wrap gap-4 mb-4 text-sm">
                       <div className="flex items-center text-gray-600">
                         <FaCalendarAlt className="mr-2 text-orange-500" />
-                        <span>{new Date(event.date).toLocaleDateString()}</span>
+                        <span>{formatDate(event.date)}</span>
                       </div>
                       <div className="flex items-center text-gray-600">
                         <FaMapMarkerAlt className="mr-2 text-orange-500" />

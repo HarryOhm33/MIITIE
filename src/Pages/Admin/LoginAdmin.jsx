@@ -24,9 +24,7 @@ const LoginAdmin = () => {
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             const data = userSnap.data();
-            if (data.isSuperAdmin === true) {
-              navigate("/superadmin");
-            } else if (data.isAdmin === true) {
+            if (data.isAdmin === true || data.isSuperAdmin === true) {
               navigate("/admin");
             }
           }
@@ -86,11 +84,7 @@ const LoginAdmin = () => {
       }
 
       toast.success("Login successful");
-      if (isUserSuperAdmin) {
-        navigate("/superadmin");
-      } else {
-        navigate("/admin");
-      }
+      navigate("/admin");
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed");

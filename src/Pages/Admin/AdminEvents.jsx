@@ -13,7 +13,18 @@ import {
   getDocs,
 } from "firebase/firestore";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 const AdminEvents = () => {
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingEvent, setEditingEvent] = useState(null);
@@ -566,13 +577,7 @@ const EventCard = ({ event, onEdit, onDelete }) => (
         <div className="flex justify-between items-center text-xs">
           <span className="font-semibold text-slate-400">Date</span>
           <span className="text-slate-700 font-medium">
-            {event.date
-              ? new Date(event.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })
-              : "No date set"}
+            {event.date ? formatDate(event.date) : "No date set"}
           </span>
         </div>
         <div className="flex justify-between items-center text-xs">

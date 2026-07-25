@@ -124,10 +124,10 @@ const SuperAdminLayout = () => {
           {/* Quick link back to standard admin portal */}
           <Link
             to="/admin"
-            className="hidden md:flex flex-row items-center justify-start gap-3 px-4 py-3 rounded-xl transition-all duration-200 w-full text-left hover:text-slate-100 text-slate-400"
+            className="flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left hover:text-slate-100 text-slate-400"
           >
             <FaArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-semibold tracking-tight">Admin Area</span>
+            <span className="text-[9px] md:text-sm font-semibold tracking-tight">Admin Area</span>
           </Link>
         </nav>
 
