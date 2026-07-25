@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaImage, FaTimes } from "react-icons/fa";
 import { uploadImage } from "../../utils/cloudinary";
+import { deleteDocumentWithImage, deleteReplacedImage } from "../../utils/imageCleanup";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { db, auth } from "../../../firebase";
@@ -9,7 +10,6 @@ import {
   doc,
   setDoc,
   updateDoc,
-  deleteDoc,
   getDocs,
 } from "firebase/firestore";
 
@@ -96,28 +96,46 @@ const AdminEvents = () => {
       }
 
       let imageUrl = eventData.image;
+      let imagePublicId = editingEvent?.imagePublicId || "";
 
       if (selectedImage) {
         try {
           const uploadResult = await uploadImage(selectedImage);
           imageUrl = uploadResult.url;
+          imagePublicId = uploadResult.publicId;
         } catch (error) {
           toast.error("Image upload failed");
           return;
         }
       }
+      if (!imageUrl) imagePublicId = "";
 
+      const { previousImagePublicId: _previousImagePublicId, ...eventFields } = eventData;
       const event = {
-        ...eventData,
+        ...eventFields,
         image: imageUrl,
+        imagePublicId,
         date: new Date(eventData.date).toISOString(),
       };
 
       if (editingEvent) {
+        const previousImagePublicId =
+          editingEvent.imagePublicId && editingEvent.imagePublicId !== imagePublicId
+            ? editingEvent.imagePublicId
+            : null;
         await updateDoc(doc(db, "events", editingEvent.id), {
           ...event,
+          ...(previousImagePublicId ? { previousImagePublicId } : {}),
           updatedAt: new Date(),
         });
+        if (previousImagePublicId) {
+          try {
+            await deleteReplacedImage("events", editingEvent.id);
+          } catch (cleanupError) {
+            console.error("Failed to delete the previous event image:", cleanupError);
+            toast.error("Event updated, but its previous image could not be deleted");
+          }
+        }
         toast.success("Event updated successfully");
       } else {
         const eventRef = doc(collection(db, "events"));
@@ -181,7 +199,7 @@ const AdminEvents = () => {
   const confirmDelete = async () => {
     if (!deletingEvent) return;
     try {
-      await deleteDoc(doc(db, "events", deletingEvent.id));
+      await deleteDocumentWithImage("events", deletingEvent.id);
       toast.success("Event deleted successfully");
       await fetchEvents();
     } catch (error) {

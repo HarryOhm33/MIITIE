@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaImage, FaTimes } from "react-icons/fa";
 import { uploadImage } from "../../utils/cloudinary";
+import { deleteDocumentWithImage, deleteReplacedImage } from "../../utils/imageCleanup";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { db, auth } from "../../../firebase";
@@ -9,7 +10,6 @@ import {
   doc,
   setDoc,
   updateDoc,
-  deleteDoc,
   getDocs,
 } from "firebase/firestore";
 
@@ -66,28 +66,45 @@ const AdminMentors = () => {
       }
 
       let imageUrl = mentorData.image;
+      let imagePublicId = editingMentor?.imagePublicId || "";
 
       if (selectedImage) {
         try {
           const uploadResult = await uploadImage(selectedImage);
           imageUrl = uploadResult.url;
+          imagePublicId = uploadResult.publicId;
         } catch (error) {
           toast.error("Image upload failed");
           return;
         }
       }
+      if (!imageUrl) imagePublicId = "";
 
       const mentor = {
         ...mentorData,
         image: imageUrl,
+        imagePublicId,
         cardPosition: Number(mentorData.cardPosition) || 0,
       };
 
       if (editingMentor) {
+        const previousImagePublicId =
+          editingMentor.imagePublicId && editingMentor.imagePublicId !== imagePublicId
+            ? editingMentor.imagePublicId
+            : null;
         await updateDoc(doc(db, "mentors", editingMentor.id), {
           ...mentor,
+          ...(previousImagePublicId ? { previousImagePublicId } : {}),
           updatedAt: new Date(),
         });
+        if (previousImagePublicId) {
+          try {
+            await deleteReplacedImage("mentors", editingMentor.id);
+          } catch (cleanupError) {
+            console.error("Failed to delete the previous mentor image:", cleanupError);
+            toast.error("Mentor updated, but its previous image could not be deleted");
+          }
+        }
         toast.success("Mentor updated successfully");
       } else {
         const mentorRef = doc(collection(db, "mentors"));
@@ -155,7 +172,7 @@ const AdminMentors = () => {
   const confirmDelete = async () => {
     if (!deletingMentor) return;
     try {
-      await deleteDoc(doc(db, "mentors", deletingMentor.id));
+      await deleteDocumentWithImage("mentors", deletingMentor.id);
       toast.success("Mentor deleted successfully");
       await fetchMentors();
     } catch (error) {

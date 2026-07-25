@@ -27,3 +27,6 @@ dist-ssr
 
 src/assets/events.js
 src/assets/events
+
+# Local Netlify folder
+.netlify
