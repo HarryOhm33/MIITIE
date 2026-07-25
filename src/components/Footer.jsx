@@ -110,7 +110,7 @@ const Footer = () => {
               infrastructure to transform innovative ideas into successful
               businesses.
             </motion.p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 mb-4">
               {socialLinks.map((social, index) => (
                 <motion.a
                   key={index}
@@ -129,6 +129,36 @@ const Footer = () => {
                 </motion.a>
               ))}
             </div>
+            <p className="text-[11px] text-gray-500/50 tracking-wider font-normal select-none transition-colors duration-300">
+              An effort by{" "}
+              <a
+                href="https://www.linkedin.com/in/sakshi-kumari-576630292/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                Sakshi
+              </a>
+              ,{" "}
+              <a
+                href="https://www.linkedin.com/in/harryohm33/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                Hari
+              </a>
+              , and{" "}
+              <a
+                href="https://www.linkedin.com/in/ankit-kumar-43495927b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white transition-colors duration-300 cursor-pointer"
+              >
+                Ankit
+              </a>{" "}
+              — 2K23 Batch
+            </p>
           </motion.div>
 
           {/* Quick Links Column */}
