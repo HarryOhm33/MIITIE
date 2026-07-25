@@ -67,6 +67,8 @@ async function sendSESEmail({ to, subject, html }) {
 
 // ---------------- HTML EMAIL TEMPLATES ----------------
 
+const LOGO_URL = "https://raw.githubusercontent.com/HarryOhm33/MIITIE/main/src/assets/miitie-logo.png";
+
 function buildSubmitterTemplate({ type, name, formTitle, detailsHtml }) {
   return `
   <!DOCTYPE html>
@@ -76,9 +78,10 @@ function buildSubmitterTemplate({ type, name, formTitle, detailsHtml }) {
     <style>
       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
       .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-      .header { background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 32px 24px; text-align: center; color: #ffffff; }
-      .header h1 { margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
-      .header p { margin: 6px 0 0 0; font-size: 13px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+      .header { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); padding: 32px 24px; text-align: center; color: #ffffff; }
+      .logo-img { height: 55px; max-width: 200px; object-fit: contain; background: #ffffff; padding: 6px 14px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+      .header h1 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+      .header p { margin: 4px 0 0 0; font-size: 12px; opacity: 0.95; text-transform: uppercase; letter-spacing: 1px; }
       .content { padding: 32px 24px; }
       .greeting { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
       .body-text { font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 24px; }
@@ -93,6 +96,7 @@ function buildSubmitterTemplate({ type, name, formTitle, detailsHtml }) {
   <body>
     <div class="card">
       <div class="header">
+        <img src="${LOGO_URL}" alt="MIITIE Logo" class="logo-img" />
         <h1>MIITIE</h1>
         <p>Innovation & Incubation Center</p>
       </div>
@@ -129,6 +133,7 @@ function buildAdminTemplate({ formTitle, name, email, detailsHtml, targetUrl }) 
       body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 20px; }
       .card { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
       .header { background: #0f172a; padding: 24px; text-align: center; color: #ffffff; border-bottom: 3px solid #f97316; }
+      .logo-img { height: 48px; max-width: 180px; object-fit: contain; background: #ffffff; padding: 5px 12px; border-radius: 10px; margin-bottom: 10px; }
       .header h1 { margin: 0; font-size: 20px; font-weight: 800; color: #f97316; }
       .header p { margin: 4px 0 0 0; font-size: 12px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
       .content { padding: 28px 24px; }
@@ -145,6 +150,7 @@ function buildAdminTemplate({ formTitle, name, email, detailsHtml, targetUrl }) 
   <body>
     <div class="card">
       <div class="header">
+        <img src="${LOGO_URL}" alt="MIITIE Logo" class="logo-img" />
         <h1>MIITIE Admin Suite</h1>
         <p>New Form Submission Alert</p>
       </div>
