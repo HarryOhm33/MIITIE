@@ -9,7 +9,7 @@ service cloud.firestore {
     function isAdmin() {
       return signedIn()
         && exists(/databases/$(database)/documents/users/$(request.auth.uid))
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+        && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isSuperAdmin == true);
     }
 
     match /users/{userId} {
@@ -48,6 +48,21 @@ service cloud.firestore {
     match /notifications/{document} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    match /mentor_applications/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /incubation_applications/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    match /contact_submissions/{document} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

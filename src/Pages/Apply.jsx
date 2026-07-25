@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { db } from "../../firebase";
+import { collection, addDoc } from "firebase/firestore";
 import {
   FaUser,
   FaEnvelope,
@@ -61,51 +63,29 @@ const Apply = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Truncate long fields to prevent "request too long" error
-    const truncatedData = {
-      ...formData,
-      startupIdea: formData.startupIdea.substring(0, 1000), // Limit to 1000 chars
-      address: formData.address.substring(0, 500), // Limit to 500 chars
-    };
-
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
-          form_type: "MIITIE Application Form",
-          ...truncatedData,
-        }),
+      await addDoc(collection(db, "incubation_applications"), {
+        ...formData,
+        status: "Pending",
+        createdAt: new Date().toISOString(),
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("Application submitted successfully!");
-        setSubmitSuccess(true);
-        // Reset form after successful submission
-        setFormData({
-          name: "",
-          email: "",
-          mobile: "",
-          address: "",
-          projectTitle: "",
-          startupIdea: "",
-          teamMembers: "",
-          stage: "idea",
-          fundingNeeded: "",
-        });
-      } else {
-        throw new Error(result.message || "Submission failed");
-      }
+      toast.success("Application submitted successfully!");
+      setSubmitSuccess(true);
+      setFormData({
+        name: "",
+        email: "",
+        mobile: "",
+        address: "",
+        projectTitle: "",
+        startupIdea: "",
+        teamMembers: "",
+        stage: "idea",
+        fundingNeeded: "",
+      });
     } catch (error) {
-      toast.error(
-        error.message ||
-          "Submission failed. Please try again with shorter responses."
-      );
+      console.error("Error submitting incubation application:", error);
+      toast.error(error.message || "Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

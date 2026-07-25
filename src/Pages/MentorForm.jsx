@@ -10,6 +10,8 @@ import {
 } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import { db } from "../../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const MentorForm = () => {
   useEffect(() => {
@@ -61,36 +63,25 @@ const MentorForm = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
-          form_type: "MIITIE Mentor Application",
-          ...formData,
-        }),
+      await addDoc(collection(db, "mentor_applications"), {
+        ...formData,
+        status: "Pending",
+        createdAt: new Date().toISOString(),
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("Mentor application submitted successfully!");
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          profession: "",
-          expertise: "",
-          experience: "",
-          linkedin: "",
-          motivation: "",
-        });
-      } else {
-        throw new Error(result.message || "Submission failed");
-      }
+      toast.success("Mentor application submitted successfully!");
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        profession: "",
+        expertise: "",
+        experience: "",
+        linkedin: "",
+        motivation: "",
+      });
     } catch (error) {
+      console.error("Error submitting mentor application:", error);
       toast.error(error.message || "Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);

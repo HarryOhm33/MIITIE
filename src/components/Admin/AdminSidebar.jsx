@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   FaSignOutAlt,
@@ -7,18 +8,70 @@ import {
   FaUsers,
   FaBell,
   FaUsersCog,
+  FaUserGraduate,
+  FaRocket,
+  FaEnvelopeOpenText,
 } from "react-icons/fa";
 import miitieLogoMini from "../../assets/miitie-logo-mini.png";
+import { db } from "../../../firebase";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
 
 const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
   const location = useLocation();
+  const [hasPendingMentors, setHasPendingMentors] = useState(false);
+  const [hasPendingIncubations, setHasPendingIncubations] = useState(false);
+  const [hasPendingContacts, setHasPendingContacts] = useState(false);
+
+  useEffect(() => {
+    const unsubMentors = onSnapshot(
+      query(collection(db, "mentor_applications"), where("status", "==", "Pending")),
+      (snapshot) => setHasPendingMentors(!snapshot.empty),
+      (err) => console.error("Error listening to mentor apps:", err)
+    );
+
+    const unsubIncubations = onSnapshot(
+      query(collection(db, "incubation_applications"), where("status", "==", "Pending")),
+      (snapshot) => setHasPendingIncubations(!snapshot.empty),
+      (err) => console.error("Error listening to incubation apps:", err)
+    );
+
+    const unsubContacts = onSnapshot(
+      query(collection(db, "contact_submissions"), where("status", "==", "Pending")),
+      (snapshot) => setHasPendingContacts(!snapshot.empty),
+      (err) => console.error("Error listening to contact messages:", err)
+    );
+
+    return () => {
+      unsubMentors();
+      unsubIncubations();
+      unsubContacts();
+    };
+  }, []);
 
   const menuItems = [
     { name: "Overview", path: "/admin", icon: <FaChartPie className="w-5 h-5" /> },
     { name: "Events", path: "/admin/events", icon: <FaCalendarAlt className="w-5 h-5" /> },
     { name: "Incubatees", path: "/admin/incubatees", icon: <FaLightbulb className="w-5 h-5" /> },
-    { name: "Mentors", path: "/admin/mentors", icon: <FaUsers className="w-5 h-5" /> },
     { name: "Notifications", path: "/admin/notifications", icon: <FaBell className="w-5 h-5" /> },
+    { name: "Mentors", path: "/admin/mentors", icon: <FaUsers className="w-5 h-5" /> },
+    {
+      name: "Mentor Apps",
+      path: "/admin/mentor-applications",
+      icon: <FaUserGraduate className="w-5 h-5" />,
+      hasBadge: hasPendingMentors,
+    },
+    {
+      name: "Incubation Apps",
+      path: "/admin/incubation-applications",
+      icon: <FaRocket className="w-5 h-5" />,
+      hasBadge: hasPendingIncubations,
+    },
+    {
+      name: "Contact Messages",
+      path: "/admin/contact-submissions",
+      icon: <FaEnvelopeOpenText className="w-5 h-5" />,
+      hasBadge: hasPendingContacts,
+    },
   ];
 
   return (
@@ -52,13 +105,25 @@ const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${isActive
+              className={`relative flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${
+                isActive
                   ? "text-orange-400 md:text-white md:bg-gradient-to-r md:from-orange-500 md:to-amber-500 md:shadow-md md:shadow-orange-500/10"
                   : "hover:text-slate-100 text-slate-400"
-                }`}
+              }`}
             >
-              {item.icon}
+              <div className="relative flex items-center justify-center">
+                {item.icon}
+                {item.hasBadge && (
+                  <span className="md:hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-orange-500 ring-2 ring-slate-900 animate-pulse" />
+                )}
+              </div>
               <span className="text-[9px] md:text-sm font-semibold tracking-tight">{item.name}</span>
+              {item.hasBadge && (
+                <span
+                  className="hidden md:block w-2.5 h-2.5 rounded-full bg-orange-500 ring-4 ring-orange-500/20 animate-pulse ml-auto"
+                  title="Pending items for review"
+                />
+              )}
             </Link>
           );
         })}

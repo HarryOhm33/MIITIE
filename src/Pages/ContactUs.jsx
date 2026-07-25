@@ -7,6 +7,8 @@ import {
   FaPhoneAlt,
 } from "react-icons/fa";
 import toast from "react-hot-toast";
+import { db } from "../../firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
@@ -53,35 +55,22 @@ const ContactUs = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          access_key: import.meta.env.VITE_WEB3FORMS_ACCESS_KEY,
-          form_type: "MIITIE Contact Form", // Add this unique identifier
-          name: formData.name,
-          email: formData.email,
-          subject: formData.subject,
-          message: formData.message,
-        }),
+      // Save to Firebase Firestore collection
+      await addDoc(collection(db, "contact_submissions"), {
+        ...formData,
+        status: "Pending",
+        createdAt: new Date().toISOString(),
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        toast.success("Form submitted! We will get back to you shortly.");
-        setFormData({
-          name: "",
-          email: "",
-          subject: "",
-          message: "",
-        });
-      } else {
-        throw new Error(result.message || "Submission failed");
-      }
+      toast.success("Form submitted! We will get back to you shortly.");
+      setFormData({
+        name: "",
+        email: "",
+        subject: "",
+        message: "",
+      });
     } catch (error) {
+      console.error("Error submitting contact form:", error);
       toast.error(error.message || "Submission failed. Please try again.");
     } finally {
       setIsSubmitting(false);
