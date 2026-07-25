@@ -9,7 +9,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import miitieLogo from "../assets/miitie-logo.jpg";
+import miitieLogo from "../assets/miitie-logo.png";
 
 const Footer = () => {
   const quickLinks = [
@@ -99,7 +99,7 @@ const Footer = () => {
                 src={miitieLogo}
                 alt="MIITIE Logo"
                 loading="lazy"
-                className="h-12 object-contain rounded-lg border-2 border-orange-300 p-0.5 mr-2"
+                className="w-40 object-contain rounded-lg border-2 border-orange-300 p-0.5 mr-2"
               />
               <h3 className="text-xl font-bold text-orange-400">
                 Incubation Centre

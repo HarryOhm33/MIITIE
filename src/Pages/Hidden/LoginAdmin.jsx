@@ -17,20 +17,9 @@ const LoginAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (data.isAdmin === true || data.isSuperAdmin === true) {
-              navigate("/admin");
-            }
-          }
-        } catch (e) {
-          console.error(e);
-        }
+        navigate("/admin");
       }
     });
 
@@ -42,13 +31,12 @@ const LoginAdmin = () => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+      // console.log(user);
 
       // Check if user exists in Firestore
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
-
-      let isUserAdmin = false;
-      let isUserSuperAdmin = false;
+      // console.log(userSnap);
 
       if (!userSnap.exists()) {
         // Create new user document
@@ -57,30 +45,13 @@ const LoginAdmin = () => {
           name: user.displayName,
           email: user.email,
           isAdmin: false,
-          isSuperAdmin: false,
           createdAt: new Date(),
         });
-      } else {
-        const data = userSnap.data();
-        isUserAdmin = data.isAdmin === true;
-        isUserSuperAdmin = data.isSuperAdmin === true;
-
-        // Proactively initialize missing fields for existing users
-        const updates = {};
-        if (data.isAdmin === undefined) updates.isAdmin = false;
-        if (data.isSuperAdmin === undefined) updates.isSuperAdmin = false;
-        if (data.hasOwnProperty("isDeveloper")) {
-          updates.isDeveloper = deleteField();
-        }
-        if (Object.keys(updates).length > 0) {
-          await updateDoc(userRef, updates);
-        }
-      }
-
-      if (!isUserAdmin && !isUserSuperAdmin) {
-        await signOut(auth);
-        toast.error("Insufficient permissions. Logged out.");
-        return;
+      } else if (userSnap.data().hasOwnProperty("isDeveloper")) {
+        // Proactively remove the deprecated isDeveloper field from existing users
+        await updateDoc(userRef, {
+          isDeveloper: deleteField(),
+        });
       }
 
       toast.success("Login successful");

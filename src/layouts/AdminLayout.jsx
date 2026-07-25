@@ -6,7 +6,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FaSignOutAlt, FaUsersCog } from "react-icons/fa";
 import toast from "react-hot-toast";
 import AdminSidebar from "../components/Admin/AdminSidebar";
-import miitieLogoMini from "../assets/miitie-logo-mini.jpg";
+import miitieLogoMini from "../assets/miitie-logo-mini.png";
 
 const AdminLayout = () => {
   const navigate = useNavigate();

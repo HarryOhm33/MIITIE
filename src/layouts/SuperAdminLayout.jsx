@@ -5,7 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { FaSignOutAlt, FaShieldAlt, FaUsersCog, FaArrowLeft } from "react-icons/fa";
 import toast from "react-hot-toast";
-import miitieLogoMini from "../assets/miitie-logo-mini.jpg";
+import miitieLogoMini from "../assets/miitie-logo-mini.png";
 
 const SuperAdminLayout = () => {
   const navigate = useNavigate();
@@ -111,11 +111,10 @@ const SuperAdminLayout = () => {
         <nav className="flex flex-row md:flex-col md:flex-1 justify-around md:justify-start items-center w-full px-2 md:px-4 py-0 md:py-6 space-y-0 md:space-y-1.5 overflow-x-auto md:overflow-y-auto">
           <Link
             to="/superadmin"
-            className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${
-              location.pathname === "/superadmin" || location.pathname === "/superadmin/"
+            className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${location.pathname === "/superadmin" || location.pathname === "/superadmin/"
                 ? "text-amber-400 md:text-white md:bg-gradient-to-r md:from-amber-600 md:to-orange-600 md:shadow-md md:shadow-amber-500/10"
                 : "hover:text-slate-100 text-slate-400"
-            }`}
+              }`}
           >
             <FaUsersCog className="w-5 h-5" />
             <span className="text-[9px] md:text-sm font-semibold tracking-tight">Users Control</span>

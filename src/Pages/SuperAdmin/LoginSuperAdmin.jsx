@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { doc, getDoc, setDoc, updateDoc, deleteField } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../../firebase";
 import {
   GoogleAuthProvider,
   signInWithPopup,
   onAuthStateChanged,
+  signOut,
 } from "firebase/auth";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -13,23 +14,17 @@ import { FcGoogle } from "react-icons/fc";
 import { FaArrowLeft, FaShieldAlt } from "react-icons/fa";
 import miitieLogoMini from "../../assets/miitie-logo-mini.png";
 
-const LoginAdmin = () => {
+const LoginSuperAdmin = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        try {
-          const userRef = doc(db, "users", user.uid);
-          const userSnap = await getDoc(userRef);
-          if (userSnap.exists()) {
-            const data = userSnap.data();
-            if (data.isAdmin === true || data.isSuperAdmin === true) {
-              navigate("/admin");
-            }
-          }
-        } catch (e) {
-          console.error(e);
+        // Quick verify
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().isSuperAdmin === true) {
+          navigate("/superadmin");
         }
       }
     });
@@ -43,15 +38,12 @@ const LoginAdmin = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if user exists in Firestore
+      // Check if user exists in Firestore and is Super Admin
       const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
-      let isUserAdmin = false;
-      let isUserSuperAdmin = false;
-
       if (!userSnap.exists()) {
-        // Create new user document
+        // Create new user document with default roles
         await setDoc(userRef, {
           uid: user.uid,
           name: user.displayName,
@@ -60,33 +52,23 @@ const LoginAdmin = () => {
           isSuperAdmin: false,
           createdAt: new Date(),
         });
-      } else {
-        const data = userSnap.data();
-        isUserAdmin = data.isAdmin === true;
-        isUserSuperAdmin = data.isSuperAdmin === true;
 
-        // Proactively initialize missing fields for existing users
-        const updates = {};
-        if (data.isAdmin === undefined) updates.isAdmin = false;
-        if (data.isSuperAdmin === undefined) updates.isSuperAdmin = false;
-        if (data.hasOwnProperty("isDeveloper")) {
-          updates.isDeveloper = deleteField();
-        }
-        if (Object.keys(updates).length > 0) {
-          await updateDoc(userRef, updates);
-        }
-      }
-
-      if (!isUserAdmin && !isUserSuperAdmin) {
         await signOut(auth);
-        toast.error("Insufficient permissions. Logged out.");
+        toast.error("Unauthorized: Super Admin access required.");
         return;
       }
 
-      toast.success("Login successful");
-      navigate("/admin");
+      const userData = userSnap.data();
+      if (userData.isSuperAdmin !== true) {
+        await signOut(auth);
+        toast.error("Unauthorized: Super Admin access required.");
+        return;
+      }
+
+      toast.success("Super Admin Authentication Successful");
+      navigate("/superadmin");
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Super Admin login error:", error);
       toast.error("Login failed");
     }
   };
@@ -94,8 +76,8 @@ const LoginAdmin = () => {
   return (
     <div className="relative min-h-[90vh] flex items-center justify-center bg-slate-50 overflow-hidden py-12 px-4 sm:px-6 lg:px-8">
       {/* Decorative background glows */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-orange-400/10 blur-[120px] pointer-events-none animate-pulse duration-[8s]" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-blue-500/10 blur-[130px] pointer-events-none animate-pulse duration-[10s]" />
+      <div className="absolute top-[-10%] left-[-10%] w-[40vw] h-[40vw] rounded-full bg-amber-500/10 blur-[120px] pointer-events-none animate-pulse duration-[8s]" />
+      <div className="absolute bottom-[-10%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-orange-600/10 blur-[130px] pointer-events-none animate-pulse duration-[10s]" />
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -114,8 +96,8 @@ const LoginAdmin = () => {
 
         {/* Card */}
         <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl border border-slate-100 p-8 sm:p-10 relative overflow-hidden">
-          {/* Top orange line accent */}
-          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-400 to-amber-500" />
+          {/* Top amber line accent */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-500 to-orange-600" />
 
           {/* Logo & Header */}
           <div className="flex flex-col items-center text-center mb-8">
@@ -128,23 +110,23 @@ const LoginAdmin = () => {
               <img
                 src={miitieLogoMini}
                 alt="MIITIE Logo"
-                className="h-12 w-12 object-contain rounded-xl border border-orange-300 p-0.5 bg-white shadow-sm"
+                className="h-12 w-12 object-contain rounded-xl border border-amber-300 p-0.5 bg-white shadow-sm"
               />
             </motion.div>
 
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-              MIITIE Admin Portal
+              Super Admin Console
             </h2>
             <p className="mt-2 text-sm text-slate-500 max-w-xs">
-              Authorized access only. Sign in with your Google account to manage the incubation dashboard.
+              System Operators only. Sign in with Google to access the root permissions control panel.
             </p>
           </div>
 
           {/* Warning banner */}
-          <div className="mb-6 flex items-start gap-3 bg-amber-50/70 border border-amber-200/50 rounded-xl p-3.5 text-amber-800 text-xs leading-relaxed">
-            <FaShieldAlt className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="mb-6 flex items-start gap-3 bg-red-50/70 border border-red-200/50 rounded-xl p-3.5 text-red-800 text-xs leading-relaxed">
+            <FaShieldAlt className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
             <span>
-              Access is restricted to administrators of the MIITIE Incubation Centre. Unauthorized attempts will be logged.
+              Restricted console access. Unauthorized activities will trigger security investigations and audit logging.
             </span>
           </div>
 
@@ -153,20 +135,20 @@ const LoginAdmin = () => {
             whileHover={{ scale: 1.02, translateY: -1 }}
             whileTap={{ scale: 0.98 }}
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 border border-slate-200 rounded-xl shadow-sm hover:shadow transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 border border-slate-200 rounded-xl shadow-sm hover:shadow transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
           >
             <FcGoogle className="w-6 h-6" />
-            <span>Continue with Google</span>
+            <span>Continue to Operator Space</span>
           </motion.button>
         </div>
 
         {/* Footer info */}
         <p className="text-center text-xs text-slate-400 mt-6">
-          © {new Date().getFullYear()} MIITIE. All rights reserved.
+          © {new Date().getFullYear()} MIITIE Security Suite. All rights reserved.
         </p>
       </motion.div>
     </div>
   );
 };
 
-export default LoginAdmin;
+export default LoginSuperAdmin;

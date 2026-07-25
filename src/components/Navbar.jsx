@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaBars, FaTimes, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import miitieLogo from "../assets/miitie-logo.jpg"; // Adjust the path as necessary
+import miitieLogo from "../assets/miitie-logo.png"; // Adjust the path as necessary
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -69,7 +69,7 @@ const Navbar = () => {
                 <img
                   src={miitieLogo}
                   alt="MIITIE Logo"
-                  className="h-12 object-contain rounded-lg border-2 border-orange-300 p-0.5"
+                  className="h-14 object-contain rounded-lg border-2 border-orange-300 p-0.5"
                 />
               </motion.div>
               <span className="ml-2 text-lg font-bold text-gray-800 hidden sm:block">
@@ -86,11 +86,10 @@ const Navbar = () => {
                   <div className="relative group h-full flex items-center">
                     <Link
                       to={link.path}
-                      className={`px-4 py-2 font-medium flex items-center transition-colors rounded-md h-full ${
-                        location.pathname.startsWith(link.path)
-                          ? "text-orange-500"
-                          : "text-gray-700 hover:text-orange-500"
-                      }`}
+                      className={`px-4 py-2 font-medium flex items-center transition-colors rounded-md h-full ${location.pathname.startsWith(link.path)
+                        ? "text-orange-500"
+                        : "text-gray-700 hover:text-orange-500"
+                        }`}
                       onClick={(e) => {
                         if (activeDropdown === index) {
                           e.preventDefault();
@@ -119,11 +118,10 @@ const Navbar = () => {
                             <Link
                               key={subIndex}
                               to={subLink.path}
-                              className={`block px-4 py-2.5 transition-colors text-sm ${
-                                location.pathname === subLink.path
-                                  ? "bg-orange-50 text-orange-500 font-medium"
-                                  : "text-gray-700 hover:bg-orange-50 hover:text-orange-500"
-                              }`}
+                              className={`block px-4 py-2.5 transition-colors text-sm ${location.pathname === subLink.path
+                                ? "bg-orange-50 text-orange-500 font-medium"
+                                : "text-gray-700 hover:bg-orange-50 hover:text-orange-500"
+                                }`}
                             >
                               {subLink.name}
                             </Link>
@@ -135,11 +133,10 @@ const Navbar = () => {
                 ) : (
                   <Link
                     to={link.path}
-                    className={`px-4 py-2 font-medium transition-colors rounded-md ${
-                      location.pathname === link.path
-                        ? "text-orange-500"
-                        : "text-gray-700 hover:text-orange-500"
-                    }`}
+                    className={`px-4 py-2 font-medium transition-colors rounded-md ${location.pathname === link.path
+                      ? "text-orange-500"
+                      : "text-gray-700 hover:text-orange-500"
+                      }`}
                   >
                     {link.name}
                   </Link>
@@ -190,11 +187,10 @@ const Navbar = () => {
                     {link.subLinks ? (
                       <div className="flex flex-col">
                         <button
-                          className={`px-4 py-3 text-left flex justify-between items-center w-full ${
-                            location.pathname.startsWith(link.path)
-                              ? "text-orange-500 font-medium"
-                              : "text-gray-700"
-                          }`}
+                          className={`px-4 py-3 text-left flex justify-between items-center w-full ${location.pathname.startsWith(link.path)
+                            ? "text-orange-500 font-medium"
+                            : "text-gray-700"
+                            }`}
                           onClick={() => toggleDropdown(index)}
                           aria-expanded={activeDropdown === index}
                         >
@@ -216,11 +212,10 @@ const Navbar = () => {
                             <Link
                               key={subIndex}
                               to={subLink.path}
-                              className={`block px-4 py-2.5 text-sm ${
-                                location.pathname === subLink.path
-                                  ? "bg-orange-50 text-orange-500 font-medium"
-                                  : "text-gray-700 hover:bg-orange-50"
-                              }`}
+                              className={`block px-4 py-2.5 text-sm ${location.pathname === subLink.path
+                                ? "bg-orange-50 text-orange-500 font-medium"
+                                : "text-gray-700 hover:bg-orange-50"
+                                }`}
                             >
                               {subLink.name}
                             </Link>
@@ -230,11 +225,10 @@ const Navbar = () => {
                     ) : (
                       <Link
                         to={link.path}
-                        className={`block px-4 py-3 ${
-                          location.pathname === link.path
-                            ? "text-orange-500 font-medium"
-                            : "text-gray-700 hover:bg-orange-50"
-                        }`}
+                        className={`block px-4 py-3 ${location.pathname === link.path
+                          ? "text-orange-500 font-medium"
+                          : "text-gray-700 hover:bg-orange-50"
+                          }`}
                       >
                         {link.name}
                       </Link>

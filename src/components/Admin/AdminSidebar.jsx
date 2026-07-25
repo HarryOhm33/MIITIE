@@ -8,7 +8,7 @@ import {
   FaBell,
   FaUsersCog,
 } from "react-icons/fa";
-import miitieLogoMini from "../../assets/miitie-logo-mini.jpg";
+import miitieLogoMini from "../../assets/miitie-logo-mini.png";
 
 const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
   const location = useLocation();
@@ -52,11 +52,10 @@ const AdminSidebar = ({ userName, onLogout, isSuperAdmin }) => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${
-                isActive
+              className={`flex flex-col md:flex-row items-center justify-center md:justify-start gap-1 md:gap-3 px-3 md:px-4 py-1.5 md:py-3 rounded-xl transition-all duration-200 w-full text-center md:text-left ${isActive
                   ? "text-orange-400 md:text-white md:bg-gradient-to-r md:from-orange-500 md:to-amber-500 md:shadow-md md:shadow-orange-500/10"
                   : "hover:text-slate-100 text-slate-400"
-              }`}
+                }`}
             >
               {item.icon}
               <span className="text-[9px] md:text-sm font-semibold tracking-tight">{item.name}</span>
